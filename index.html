@@ -28,11 +28,11 @@
         .work-card h3 { font-size: 1rem; color: #fff; margin-bottom: 4px; }
         .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; }
         .work-card .location { font-size: 0.8rem; color: var(--text-muted); background: #18181b; display: inline-block; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
-        .work-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; margin: 8px 0; }
+        .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin: 8px 0; display: block; }
         .work-card p { font-size: 0.85rem; color: #d4d4d8; line-height: 1.4; border-top: 1px solid #3f3f46; padding-top: 8px; }
 
         #map { flex: 1; height: 100%; background-color: #18181b; }
-        .leaflet-popup-content img { width: 100%; max-height: 130px; object-fit: cover; border-radius: 4px; margin: 5px 0; }
+        .leaflet-popup-content img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin: 6px 0; display: block; }
 
         @media (max-width: 768px) {
             body { flex-direction: column; }
@@ -65,7 +65,7 @@
                 lat: 40.1885,
                 lng: 29.0610,
                 quote: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Bursa_from_Citadel_Walls.jpg/800px-Bursa_from_Citadel_Walls.jpg"
+                image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
             {
                 id: 2,
@@ -75,7 +75,7 @@
                 lat: 39.4447,
                 lng: 31.5369,
                 quote: "Bu köylüler, aydın kişinin uzattığı eli ısıracak kadar yaban ve yalnız bırakılmışlardı.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Porsuk_Çayı_Eskişehir_2.jpg/800px-Porsuk_Çayı_Eskişehir_2.jpg"
+                image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800"
             },
             {
                 id: 3,
@@ -85,7 +85,7 @@
                 lat: 41.0082,
                 lng: 28.9784,
                 quote: "Şehzadebaşı'nın o eski, huzurlu ramazan akşamlarında saat sesleri insanı zamanın dışına taşıardı.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Istanbul_asv2020-02_img_isuv_0427.jpg/800px-Istanbul_asv2020-02_img_isuv_0427.jpg"
+                image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800"
             },
             {
                 id: 4,
@@ -95,7 +95,7 @@
                 lat: 37.0000,
                 lng: 35.3213,
                 quote: "Çukurova yanıyor, demir gibi kızıyordu. Toroslar'ın ardında ise bambaşka bir dünya esiyordu.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Toros_Dağları_01.jpg/800px-Toros_Dağları_01.jpg"
+                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
             },
             {
                 id: 5,
@@ -105,7 +105,7 @@
                 lat: 41.6771,
                 lng: 26.5557,
                 quote: "Edirne şehri rûy-i zemin cennetinden bir köşedir. Mimar Sinan'ın kalfalık eserim dediği Selimiye cihanın göz bebeğidir.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Selimiye_Mosque_Edirne_2009.jpg/800px-Selimiye_Mosque_Edirne_2009.jpg"
+                image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800"
             }
         ];
 
@@ -128,7 +128,7 @@
                              '<p>"' + item.quote + '"</p>';
 
             const marker = L.marker([item.lat, item.lng]).addTo(map);
-            marker.bindPopup('<b>' + item.title + '</b><br><em>' + item.author + '</em><br><b>Mekân:</b> ' + item.locationName + '<br><img src="' + item.image + '" style="width:100%; max-height:120px; object-fit:cover; margin-top:5px;"><br>"' + item.quote + '"');
+            marker.bindPopup('<b>' + item.title + '</b><br><em>' + item.author + '</em><br><b>Mekân:</b> ' + item.locationName + '<br><img src="' + item.image + '" alt="' + item.title + '"><br>"' + item.quote + '"');
 
             card.addEventListener('click', function() {
                 map.setView([item.lat, item.lng], 10);
