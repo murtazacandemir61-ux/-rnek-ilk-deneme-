@@ -30,7 +30,7 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* Apple Sıvı Cam (Glassmorphism) Sol Panel */
+        /* Sol Panel */
         #sidebar { 
             width: 400px; 
             min-width: 400px;
@@ -54,7 +54,7 @@
         .work-list::-webkit-scrollbar { width: 6px; }
         .work-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        /* Apple Yumuşak Dokulu Kartlar */
+        /* Kartlar */
         .work-card { 
             background: var(--card-bg); 
             backdrop-filter: blur(10px);
@@ -79,22 +79,42 @@
         .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin: 6px 0 10px 0; display: block; border: 1px solid var(--border-glass); }
         .work-card p { font-size: 0.85rem; color: #d4d4d8; line-height: 1.5; border-top: 1px solid var(--border-glass); padding-top: 10px; }
 
-        /* Harita Alanı (Yükleme sorununu önlemek için tam esnek yapı) */
+        /* Harita Alanı */
         #map { flex-grow: 1; height: 100%; width: 100%; background-color: #0b0b0d; position: relative; }
         
+        /* Özel Apple Popup ve Kapatma Butonu Tasarımı */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(28, 28, 30, 0.9) !important;
-            backdrop-filter: blur(20px) !important;
+            background: rgba(28, 28, 30, 0.95) !important;
+            backdrop-filter: blur(25px) !important;
             color: #fff !important;
             border-radius: 16px !important;
             border: 1px solid var(--border-glass);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
         }
         .leaflet-popup-content img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: block; }
+        .leaflet-container a.leaflet-popup-close-button {
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #fff !important;
+            border-radius: 50% !important;
+            width: 24px !important;
+            height: 24px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            top: 12px !important;
+            right: 12px !important;
+            font-size: 14px !important;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .leaflet-container a.leaflet-popup-close-button:hover {
+            background: rgba(245, 158, 11, 0.8) !important;
+        }
 
-        /* Sağ Üst Oval Hap Şeklinde Dil Butonu */
-        #lang-container { position: absolute; top: 20px; right: 24px; z-index: 2000; }
-        #lang-btn { 
+        /* Sağ Üst Kontroller (Dil ve Harita Modülü) */
+        .top-controls { position: absolute; top: 20px; right: 24px; z-index: 2000; display: flex; gap: 12px; }
+        
+        .pill-btn { 
             background: rgba(28, 28, 30, 0.85); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px);
@@ -113,9 +133,9 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
             transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
         }
-        #lang-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
+        .pill-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
         
-        #lang-menu { 
+        .dropdown-menu { 
             display: none; 
             position: absolute; 
             right: 0; 
@@ -128,16 +148,16 @@
             overflow-y: auto; 
             max-height: 320px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
-            width: 160px; 
+            width: 170px; 
             padding: 6px;
             scrollbar-width: thin;
             scrollbar-color: rgba(255,255,255,0.2) transparent;
         }
-        #lang-menu::-webkit-scrollbar { width: 5px; }
-        #lang-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        #lang-menu.show { display: block; animation: fadeIn 0.2s ease; }
+        .dropdown-menu::-webkit-scrollbar { width: 5px; }
+        .dropdown-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        .dropdown-menu.show { display: block; animation: fadeIn 0.2s ease; }
         
-        .lang-option { 
+        .dropdown-option { 
             padding: 9px 12px; 
             color: var(--text-primary); 
             background: none; 
@@ -150,7 +170,7 @@
             transition: background 0.15s;
             font-weight: 500;
         }
-        .lang-option:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-color); }
+        .dropdown-option:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-color); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-6px); }
@@ -167,20 +187,33 @@
 </head>
 <body>
 
-    <!-- Sağ Üst Oval Dil Butonu -->
-    <div id="lang-container">
-        <button id="lang-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
-        <div id="lang-menu">
-            <button class="lang-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
-            <button class="lang-option" onclick="setLanguage('en')">🇬🇧 English</button>
-            <button class="lang-option" onclick="setLanguage('fr')">🇫🇷 Français</button>
-            <button class="lang-option" onclick="setLanguage('ar')">🇸🇦 العربية</button>
-            <button class="lang-option" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
-            <button class="lang-option" onclick="setLanguage('zh')">🇨🇳 中文</button>
-            <button class="lang-option" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
-            <button class="lang-option" onclick="setLanguage('el')">🇬🇷 Ελληνικά</button>
-            <button class="lang-option" onclick="setLanguage('ja')">🇯🇵 日本語</button>
-            <button class="lang-option" onclick="setLanguage('hi')">🇮🇳 हिन्दी</button>
+    <!-- Sağ Üst Kontroller (Harita Modu ve Dil Seçici) -->
+    <div class="top-controls">
+        <!-- Harita Modülü Butonu -->
+        <div style="position: relative;">
+            <button class="pill-btn" onclick="toggleMapMenu()" id="map-mode-btn">🗺️ Harita Modu</button>
+            <div id="map-menu" class="dropdown-menu">
+                <button class="dropdown-option" onclick="setMapStyle('standard')">🗺️ Standart Atlas</button>
+                <button class="dropdown-option" onclick="setMapStyle('topo')">⛰️ Kabartılı Topo</button>
+                <button class="dropdown-option" onclick="setMapStyle('satellite')">🛰️ Uydu Görünümü</button>
+            </div>
+        </div>
+
+        <!-- Dil Seçici Butonu -->
+        <div style="position: relative;" id="lang-container">
+            <button class="pill-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
+            <div id="lang-menu" class="dropdown-menu">
+                <button class="dropdown-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
+                <button class="dropdown-option" onclick="setLanguage('en')">🇬🇧 English</button>
+                <button class="dropdown-option" onclick="setLanguage('fr')">🇫🇷 Français</button>
+                <button class="dropdown-option" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+                <button class="dropdown-option" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
+                <button class="dropdown-option" onclick="setLanguage('zh')">🇨🇳 中文</button>
+                <button class="dropdown-option" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="dropdown-option" onclick="setLanguage('el')">🇬🇷 Ελληνικά</button>
+                <button class="dropdown-option" onclick="setLanguage('ja')">🇯🇵 日本語</button>
+                <button class="dropdown-option" onclick="setLanguage('hi')">🇮🇳 हिन्दी</button>
+            </div>
         </div>
     </div>
 
@@ -197,36 +230,25 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const uiTexts = {
-            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:" },
-            en: { title: "Turkish Literature Atlas", loc: "Location:" },
-            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:" },
-            ar: { title: "أطلس الأدب التركي", loc: "الموقع:" },
-            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:" },
-            zh: { title: "土耳其文学地图集", loc: "地点：" },
-            de: { title: "Türkischer Literaturatlas", loc: "Ort:" },
-            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:" },
-            ja: { title: "トルコ文学アトラス", loc: "場所：" },
-            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:" }
+            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu" },
+            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style" },
+            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte" },
+            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة" },
+            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه" },
+            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式" },
+            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil" },
+            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη" },
+            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル" },
+            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली" }
         };
 
         const literaryData = [
             {
                 id: 1,
-                title: { 
-                    tr: "Çalıkuşu", en: "The Wren", fr: "L'Oiselle", 
-                    ar: "طائر الدبس", fa: "چکاوک", zh: "鹪鹩", de: "Der Buchfink", el: "Τσαλουκούσου", ja: "チャルクシュ", hi: "चलिकुशु" 
-                },
-                author: { 
-                    tr: "Reşat Nuri Güntekin", en: "Reşat Nuri Güntekin", fr: "Reşat Nuri Güntekin", 
-                    ar: "رشاد نوري غونتكين", fa: "رشاد نوری گون تکین", zh: "雷沙特·努里·金特金", de: "Reşat Nuri Güntekin", el: "Ρεσάτ Νουρί Γκουντεκίν", ja: "レシャト・ヌリ・ギュンテキン", hi: "रेशाट नूरी गुन्तेकिन" 
-                },
-                locationName: { 
-                    tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)", 
-                    ar: "قرية زينيلير (بورصة)", fa: "روستای زینیلر (بورسا)", zh: "泽伊尼勒村 (布尔萨)", de: "Dorf Zeyniler (Bursa)", el: "Χωριό Ζεινιλέρ (Προύσα)", ja: "ゼイニレル村 (ブルサ)", hi: "ज़ेयनिलेर गाँव (बुर्सा)" 
-                },
-                lat: 40.1885,
-                lng: 29.0610,
-                emoji: "🌳",
+                title: { tr: "Çalıkuşu", en: "The Wren", fr: "L'Oiselle", ar: "طائر الدبس", fa: "چکاوک", zh: "鹪鹩", de: "Der Buchfink", el: "Τσαλουκούσου", ja: "チャルクシュ", hi: "चलिकुशु" },
+                author: { tr: "Reşat Nuri Güntekin", en: "Reşat Nuri Güntekin", fr: "Reşat Nuri Güntekin", ar: "رشاد نوري غونتكين", fa: "رشاد نوری گون تکین", zh: "雷沙特·努里·金特金", de: "Reşat Nuri Güntekin", el: "Ρεσάτ Νουρί Γκουντεκίν", ja: "レシャト・ヌリ・ギュンテキン", hi: "रेशाट नूरी गुन्तेकिन" },
+                locationName: { tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)", ar: "قرية زينيلير (بورصة)", fa: "روستای زینیلر (بورسا)", zh: "泽伊尼勒村 (布尔萨)", de: "Dorf Zeyniler (Bursa)", el: "Χωριό Ζεινιλέρ (Προύσα)", ja: "ゼイニレル村 (ブルサ)", hi: "ज़ेयनिलेर गाँव (बुर्सा)" },
+                lat: 40.1885, lng: 29.0610, emoji: "🌳",
                 quote: {
                     tr: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
                     en: "Zeyniler village was a quiet place surrounded by walnut trees at the end of a winding slope coming down from the mountain.",
@@ -237,27 +259,16 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी。"
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
             {
                 id: 2,
-                title: { 
-                    tr: "Yaban", en: "The Stranger", fr: "L'Étranger", 
-                    ar: "الأجنبي (ياباني)", fa: "بیگانه (یابان)", zh: "异乡人", de: "Der Fremde", el: "Ο Ξένος", ja: "異邦人", hi: "अजनबी" 
-                },
-                author: { 
-                    tr: "Yakup Kadri Karaosmanoğlu", en: "Yakup Kadri Karaosmanoğlu", fr: "Yakup Kadri Karaosmanoğlu", 
-                    ar: "يعقوب قادري قره عثمان أوغلو", fa: "یعقوب قدری کاراوسمان‌اوغلو", zh: "雅库普·卡德里·卡拉奥斯马诺格卢", de: "Yakup Kadri Karaosmanoğlu", el: "Γιακούπ Καντρί Καραοσμανογλού", ja: "ヤクプ・カドリ・カラオスマノール", hi: "याकुप कादरी काराओस्मानोग्लू" 
-                },
-                locationName: { 
-                    tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)", 
-                    ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्किसेहिर)" 
-                },
-                lat: 39.4447,
-                lng: 31.5369,
-                emoji: "💧",
+                title: { tr: "Yaban", en: "The Stranger", fr: "L'Étranger", ar: "الأجنبي (ياباني)", fa: "بیگانه (یابان)", zh: "异乡人", de: "Der Fremde", el: "Ο Ξένος", ja: "異邦人", hi: "अजनबी" },
+                author: { tr: "Yakup Kadri Karaosmanoğlu", en: "Yakup Kadri Karaosmanoğlu", fr: "Yakup Kadri Karaosmanoğlu", ar: "يعقوب قادري قره عثمان أوغلو", fa: "یعقوب قدری کاراوسمان‌اوغلو", zh: "雅库普·卡德里·卡拉奥斯马诺格卢", de: "Yakup Kadri Karaosmanoğlu", el: "Γιακούπ Καντρί Καραοσμανογλού", ja: "ヤクプ・カドリ・カラオスマノール", hi: "याकुप कादरी काराओस्मानोग्लू" },
+                locationName: { tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)", ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्किसेहिर)" },
+                lat: 39.4447, lng: 31.5369, emoji: "💧",
                 quote: {
                     tr: "Bu köylüler, aydın kişinin uzattığı eli ısıracak kadar yaban ve yalnız bırakılmışlardı.",
                     en: "These villagers had been left so wild and alone that they would bite the hand extended by the intellectual.",
@@ -274,21 +285,10 @@
             },
             {
                 id: 3,
-                title: { 
-                    tr: "Saatleri Ayarlama Enstitüsü", en: "The Time Regulation Institute", fr: "L'Institut de Régulation des Heures", 
-                    ar: "معهد ضبط الساعات", fa: "مؤسسه تنظیم ساعت", zh: "时钟调节研究所", de: "Das Institut zur Uhrenregulierung", el: "Ινστιτούτο Ρύθμισης Ωρολογίων", ja: "時計調整研究所", hi: "समय विनियमन संस्थान" 
-                },
-                author: { 
-                    tr: "Ahmet Hamdi Tanpınar", en: "Ahmet Hamdi Tanpınar", fr: "Ahmet Hamdi Tanpınar", 
-                    ar: "أحمد حمدي طانبنار", fa: "احمد حمدی طانپینار", zh: "艾哈迈德·哈姆迪·坦皮纳尔", de: "Ahmet Hamdi Tanpınar", el: "Αχμέτ Χαμντί Τανπινάρ", ja: "アフメト・ハムディ・タンピナル", hi: "अहमद हम्दी तानपिनार" 
-                },
-                locationName: { 
-                    tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)", 
-                    ar: "شهزاده باشي (إسطنبول)", fa: "شاهزاده‌باشی (استانبول)", zh: "谢扎德巴什 (伊斯坦布尔)", de: "Şehzadebaşı (Istanbul)", el: "Şehzadebaşı (Κωνσταντινούπολη)", ja: "シェフザーデバシュ (イスタンブール)", hi: "शेहजादेबासी (इस्तांबुल)" 
-                },
-                lat: 41.0082,
-                lng: 28.9784,
-                emoji: "⏰",
+                title: { tr: "Saatleri Ayarlama Enstitüsü", en: "The Time Regulation Institute", fr: "L'Institut de Régulation des Heures", ar: "معهد ضبط الساعات", fa: "مؤسسه تنظیم ساعت", zh: "时钟调节研究所", de: "Das Institut zur Uhrenregulierung", el: "Ινστιτούτο Ρύθμισης Ωρολογίων", ja: "時計調整研究所", hi: "समय विनियमन संस्थान" },
+                author: { tr: "Ahmet Hamdi Tanpınar", en: "Ahmet Hamdi Tanpınar", fr: "Ahmet Hamdi Tanpınar", ar: "أحمد حمدي طانبنار", fa: "احمد حمدی طانپینار", zh: "艾哈迈德·哈姆迪·坦皮纳尔", de: "Ahmet Hamdi Tanpınar", el: "Αχμέτ Χαμντί Τανπινάρ", ja: "アフメト・ハムディ・タンピナル", hi: "अहमद हम्दी तानपिनार" },
+                locationName: { tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)", ar: "شهزاده باشي (إسطنبول)", fa: "شاهزاده‌باشی (استانبول)", zh: "谢扎德巴什 (伊斯坦布尔)", de: "Şehzadebaşı (Istanbul)", el: "Şehzadebaşı (Κωνσταντινούπολη)", ja: "シェフザーデバシュ (イスタンブール)", hi: "शेहजादेबासी (इस्तांबुल)" },
+                lat: 41.0082, lng: 28.9784, emoji: "⏰",
                 quote: {
                     tr: "Şehzadebaşı'nın o eski, huzurlu ramazan akşamlarında saat sesleri insanı zamanın dışına taşıardı.",
                     en: "In those old, peaceful Ramadan evenings of Şehzadebaşı, the sounds of clocks carried a person outside of time.",
@@ -305,21 +305,10 @@
             },
             {
                 id: 4,
-                title: { 
-                    tr: "İnce Memed", en: "Memed, My Hawk", fr: "Memed le Migre", 
-                    ar: "إينجه ميميد", fa: "مهمد لاغر / اینجه ممید", zh: "瘦子梅梅德", de: "Ince Memed", el: "Ιντζέ Μεμέτ", ja: "インジェ・メメト", hi: "इन्से मेमेद" 
-                },
-                author: { 
-                    tr: "Yaşar Kemal", en: "Yaşar Kemal", fr: "Yaşar Kemal", 
-                    ar: "ياشار كمال", fa: "یاشار کمال", zh: "亚沙尔·凯末尔", de: "Yaşar Kemal", el: "Γιασάρ Κεμάλ", ja: "ヤシャル・ケマル", hi: "यासार केमाल" 
-                },
-                locationName: { 
-                    tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)", 
-                    ar: "تشوكوروفا / جبال توروس (اضنة)", fa: "چوکورووا / کوه‌های توروس (آدانا)", zh: "丘库罗瓦 / 金牛座山脉 (阿达纳)", de: "Çukurova / Taurusgebirge (Adana)", el: "Τσουקורόβα / Όρη Ταύρος (Άδανα)", ja: "チュクロヴァ / トロス山脈 (アダナ)", hi: "चुकुरोवा / टॉरस पर्वत (अदाना)" 
-                },
-                lat: 37.0000,
-                lng: 35.3213,
-                emoji: "☀️",
+                title: { tr: "İnce Memed", en: "Memed, My Hawk", fr: "Memed le Migre", ar: "إينجه ميميد", fa: "مهمد لاغر / اینجه ممید", zh: "瘦子梅梅德", de: "Ince Memed", el: "Ιντζέ Μεμέτ", ja: "インジェ・メメト", hi: "इन्से मेमेद" },
+                author: { tr: "Yaşar Kemal", en: "Yaşar Kemal", fr: "Yaşar Kemal", ar: "ياشار كمال", fa: "یاشار کمال", zh: "亚沙尔·凯末尔", de: "Yaşar Kemal", el: "Γιασάρ Κεμάλ", ja: "ヤシャル・ケマル", hi: "यासार केमाल" },
+                locationName: { tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)", ar: "تشوكوروفا / جبال توروس (اضنة)", fa: "چوکورووا / کوه‌های توروس (آدانا)", zh: "丘库罗瓦 / 金牛座山脉 (阿达纳)", de: "Çukurova / Taurusgebirge (Adana)", el: "Τσουקורόβα / Όρη Ταύρος (Άδανα)", ja: "チュクロヴァ / トロス山脈 (アダナ)", hi: "चुकुरोवा / टॉरस पर्वत (अदाना)" },
+                lat: 37.0000, lng: 35.3213, emoji: "☀️",
                 quote: {
                     tr: "Çukurova yanıyor, demir gibi kızıyordu. Toroslar'ın ardında ise bambaşka bir dünya esiyordu.",
                     en: "Çukurova was burning, glowing like iron. Behind the Taurus Mountains, a completely different world was blowing.",
@@ -336,21 +325,10 @@
             },
             {
                 id: 5,
-                title: { 
-                    tr: "Seyahatname", en: "Book of Travels", fr: "Livre des Voyages", 
-                    ar: "سياحتنامة (رحلات أولياء جلبي)", fa: "سیاحت‌نامه اولیاء چلبی", zh: "旅行记", de: "Seyahatname", el: "Σεγιαχατνάμε (Βιβλίο Ταξιδίων)", ja: "旅行記 (セヤハトナメ)", hi: "सेयाहतनामे (यात्रा वृत्तांत)" 
-                },
-                author: { 
-                    tr: "Evliya Çelebi", en: "Evliya Çelebi", fr: "Evliya Çelebi", 
-                    ar: "أولياء جلبي", fa: "اولیاء چلبی", zh: "爱维利亚·切莱比", de: "Evliya Çelebi", el: "Εβλιγιά Τσελεμπί", ja: "エヴリヤ・チェレビ", hi: "एवलिया सेलेबी" 
-                },
-                locationName: { 
-                    tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)", 
-                    ar: "جامع السليمية (أدرنة)", fa: "مسجد سلیمیه (ادرنه)", zh: "塞利米耶清真寺 (埃迪尔内)", de: "Selimiye-Moschee (Edirne)", el: "Τζαμί Σελινιγιέ (Αδριανούπολη)", ja: "セリミエ・モスク (エディルネ)", hi: "सेलिमीये मस्जिद (एदिर्ने)" 
-                },
-                lat: 41.6771,
-                lng: 26.5557,
-                emoji: "🕌",
+                title: { tr: "Seyahatname", en: "Book of Travels", fr: "Livre des Voyages", ar: "سياحتنامة (رحلات أولياء جلبي)", fa: "سیاحت‌نامه اولیاء چلبی", zh: "旅行记", de: "Seyahatname", el: "Σεγιαχατνάμε (Βιβλίο Ταξιδίων)", ja: "旅行記 (セヤハトナメ)", hi: "सेयाहतनामे (यात्रा वृत्तांत)" },
+                author: { tr: "Evliya Çelebi", en: "Evliya Çelebi", fr: "Evliya Çelebi", ar: "أولياء جلبي", fa: "اولیاء چلبی", zh: "爱维利亚·切莱比", de: "Evliya Çelebi", el: "Εβλιγιά Τσελεμπί", ja: "エヴリヤ・チェレビ", hi: "एवलिया सेलेबी" },
+                locationName: { tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)", ar: "جامع السليمية (أدرنة)", fa: "مسجد سلیمیه (ادرنه)", zh: "塞利米耶清真寺 (埃迪尔内)", de: "Selimiye-Moschee (Edirne)", el: "Τζαμί Σελινιγιέ (Αδριανούπολη)", ja: "セリミエ・モスク (エディルネ)", hi: "सेलिमीये मस्जिद (एदिर्ने)" },
+                lat: 41.6771, lng: 26.5557, emoji: "🕌",
                 quote: {
                     tr: "Edirne şehri rûy-i zemin cennetinden bir köşedir. Mimar Sinan'ın kalfalık eserim dediği Selimiye cihanın göz bebeğidir.",
                     en: "The city of Edirne is a corner from the paradise of the earth. Selimiye, which Mimar Sinan called his journeyman piece, is the apple of the world's eye.",
@@ -369,34 +347,44 @@
 
         let currentLang = 'tr';
 
-        // Haritayı optimize edilmiş tampon bellek (keepBuffer) ile başlatıyoruz
+        // Harita Sınırları ve Optimizasyonu (minZoom: 6 ile Türkiye'den fazla uzaklaşılamaz)
         const map = L.map('map', { 
             zoomControl: false,
+            minZoom: 6,
+            maxZoom: 16,
             fadeAnimation: true,
-            zoomAnimation: true,
-            markerZoomAnimation: true
+            zoomAnimation: true
         }).setView([39.1667, 35.3333], 6);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Karo yükleme hatalarını önleyen ve akıcılık sağlayan ayarlar
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            keepBuffer: 8, // Ekran dışındaki karoları hafızada tutarak boşluk kalmasını engeller
-            updateWhenIdle: false, // Kaydırma esnasında anlık yükleme sağlar
-            updateWhenZooming: false,
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+        // Katman Tanımları
+        const layers = {
+            standard: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, keepBuffer: 8, attribution: '&copy; OpenStreetMap' }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, keepBuffer: 8, attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap' }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, keepBuffer: 8, attribution: 'Tiles &copy; Esri' })
+        };
 
+        let currentLayer = layers.standard.addTo(map);
         let markersLayer = {};
 
+        // Menü Kontrolleri
         function toggleLangMenu() {
             document.getElementById('lang-menu').classList.toggle('show');
+            document.getElementById('map-menu').classList.remove('show');
+        }
+
+        function toggleMapMenu() {
+            document.getElementById('map-menu').classList.toggle('show');
+            document.getElementById('lang-menu').classList.remove('show');
         }
 
         window.addEventListener('click', function(e) {
             if (!document.getElementById('lang-container').contains(e.target)) {
                 document.getElementById('lang-menu').classList.remove('show');
+            }
+            if (!e.target.closest('#map-mode-btn') && !e.target.closest('#map-menu')) {
+                document.getElementById('map-menu').classList.remove('show');
             }
         });
 
@@ -404,6 +392,12 @@
             currentLang = lang;
             document.getElementById('lang-menu').classList.remove('show');
             renderApp();
+        }
+
+        function setMapStyle(styleKey) {
+            map.removeLayer(currentLayer);
+            currentLayer = layers[styleKey].addTo(map);
+            document.getElementById('map-menu').classList.remove('show');
         }
 
         function renderApp() {
@@ -447,7 +441,6 @@
                 workListContainer.appendChild(card);
             });
             
-            // Haritanın boyutsal oturmasını zorla tetikle
             setTimeout(function() { map.invalidateSize(); }, 200);
         }
 
