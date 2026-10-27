@@ -92,31 +92,33 @@
         }
         .leaflet-popup-content img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: block; }
 
-        /* Sağ Üst Yuvarlak Apple Widget Dil Butonu */
+        /* Sağ Üst Oval Hap (Pill) Şeklinde Dil Butonu */
         #lang-container { position: absolute; top: 20px; right: 24px; z-index: 2000; }
         #lang-btn { 
-            background: rgba(28, 28, 30, 0.8); 
+            background: rgba(28, 28, 30, 0.85); 
             backdrop-filter: blur(20px); 
             -webkit-backdrop-filter: blur(20px);
             color: var(--text-primary); 
             border: 1px solid var(--border-glass); 
-            width: 48px; 
-            height: 48px; 
-            border-radius: 50%; 
+            padding: 8px 18px; 
+            height: 42px; 
+            border-radius: 21px; /* Oval / Hap biçimi */
             cursor: pointer; 
-            font-size: 1.2rem; 
+            font-size: 0.9rem; 
+            font-weight: 500;
             display: flex; 
             align-items: center; 
             justify-content: center; 
+            gap: 8px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
             transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
         }
-        #lang-btn:hover { transform: scale(1.08); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
+        #lang-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
         #lang-menu { 
             display: none; 
             position: absolute; 
             right: 0; 
-            top: 58px; 
+            top: 52px; 
             background: rgba(28, 28, 30, 0.9); 
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px);
@@ -158,9 +160,9 @@
 </head>
 <body>
 
-    <!-- Sağ Üst Yuvarlak Dil Butonu (Apple Tarzı) -->
+    <!-- Sağ Üst Oval Dil Butonu -->
     <div id="lang-container">
-        <button id="lang-btn" onclick="toggleLangMenu()" title="Dil Seç / Language">🌐</button>
+        <button id="lang-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
         <div id="lang-menu">
             <button class="lang-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
             <button class="lang-option" onclick="setLanguage('en')">🇬🇧 English</button>
@@ -195,6 +197,7 @@
                 locationName: { tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)" },
                 lat: 40.1885,
                 lng: 29.0610,
+                emoji: "🌳",
                 quote: {
                     tr: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
                     en: "Zeyniler village was a quiet place surrounded by walnut trees at the end of a winding slope coming down from the mountain.",
@@ -209,6 +212,7 @@
                 locationName: { tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)" },
                 lat: 39.4447,
                 lng: 31.5369,
+                emoji: "💧",
                 quote: {
                     tr: "Bu köylüler, aydın kişinin uzattığı eli ısıracak kadar yaban ve yalnız bırakılmışlardı.",
                     en: "These villagers had been left so wild and alone that they would bite the hand extended by the intellectual.",
@@ -223,6 +227,7 @@
                 locationName: { tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)" },
                 lat: 41.0082,
                 lng: 28.9784,
+                emoji: "⏰",
                 quote: {
                     tr: "Şehzadebaşı'nın o eski, huzurlu ramazan akşamlarında saat sesleri insanı zamanın dışına taşıardı.",
                     en: "In those old, peaceful Ramadan evenings of Şehzadebaşı, the sounds of clocks carried a person outside of time.",
@@ -237,6 +242,7 @@
                 locationName: { tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)" },
                 lat: 37.0000,
                 lng: 35.3213,
+                emoji: "☀️",
                 quote: {
                     tr: "Çukurova yanıyor, demir gibi kızıyordu. Toroslar'ın ardında ise bambaşka bir dünya esiyordu.",
                     en: "Çukurova was burning, glowing like iron. Behind the Taurus Mountains, a completely different world was blowing.",
@@ -251,6 +257,7 @@
                 locationName: { tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)" },
                 lat: 41.6771,
                 lng: 26.5557,
+                emoji: "🕌",
                 quote: {
                     tr: "Edirne şehri rûy-i zemin cennetinden bir köşedir. Mimar Sinan'ın kalfalık eserim dediği Selimiye cihanın göz bebeğidir.",
                     en: "The city of Edirne is a corner from the paradise of the earth. Selimiye, which Mimar Sinan called his journeyman piece, is the apple of the world's eye.",
@@ -309,7 +316,16 @@
                                  '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
                                  '<p>"' + item.quote[currentLang] + '"</p>';
 
-                const marker = L.marker([item.lat, item.lng]).addTo(map);
+                // Özel Emoji Pin Tasarımı (Sıvı Cam Estetiğinde)
+                const emojiIcon = L.divIcon({
+                    className: 'custom-emoji-pin',
+                    html: '<div style="background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s;">' + item.emoji + '</div>',
+                    iconSize: [42, 42],
+                    iconAnchor: [21, 21],
+                    popupAnchor: [0, -24]
+                });
+
+                const marker = L.marker([item.lat, item.lng], { icon: emojiIcon }).addTo(map);
                 marker.bindPopup('<b>' + item.title[currentLang] + '</b><br><em>' + item.author[currentLang] + '</em><br><b>' + uiTexts[currentLang].loc + '</b> ' + item.locationName[currentLang] + '<br><img src="' + item.image + '" alt="' + item.title[currentLang] + '"><br>"' + item.quote[currentLang] + '"');
 
                 markersLayer[item.id] = marker;
