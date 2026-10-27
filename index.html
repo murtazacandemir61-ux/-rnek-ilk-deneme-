@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Türk Edebiyatı Mekân ve Rota Atlası | TÜBİTAK 2209-A</title>
+    <title>Türk Edebiyatı Mekân ve Rota Atlası</title>
     <!-- Leaflet Harita Kütüphanesi CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -24,6 +24,7 @@
             color: var(--text-primary); 
             display: flex; 
             height: 100vh; 
+            width: 100vw;
             overflow: hidden; 
             position: relative; 
             -webkit-font-smoothing: antialiased;
@@ -32,6 +33,7 @@
         /* Apple Sıvı Cam (Glassmorphism) Sol Panel */
         #sidebar { 
             width: 400px; 
+            min-width: 400px;
             background: var(--panel-bg); 
             backdrop-filter: blur(30px); 
             -webkit-backdrop-filter: blur(30px);
@@ -46,8 +48,7 @@
             border-bottom: 1px solid var(--border-glass); 
             background: rgba(28, 28, 30, 0.4); 
         }
-        .sidebar-header h1 { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; letter-spacing: -0.01em; }
-        .sidebar-header p { font-size: 0.85rem; color: var(--accent-color); font-weight: 500; }
+        .sidebar-header h1 { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
         
         .work-list { overflow-y: auto; flex: 1; padding: 16px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
         .work-list::-webkit-scrollbar { width: 6px; }
@@ -78,8 +79,8 @@
         .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin: 6px 0 10px 0; display: block; border: 1px solid var(--border-glass); }
         .work-card p { font-size: 0.85rem; color: #d4d4d8; line-height: 1.5; border-top: 1px solid var(--border-glass); padding-top: 10px; }
 
-        /* Harita Alanı */
-        #map { flex: 1; height: 100%; background-color: #0b0b0d; }
+        /* Harita Alanı (Yükleme sorununu önlemek için tam esnek yapı) */
+        #map { flex-grow: 1; height: 100%; width: 100%; background-color: #0b0b0d; position: relative; }
         
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: rgba(28, 28, 30, 0.9) !important;
@@ -91,7 +92,7 @@
         }
         .leaflet-popup-content img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: block; }
 
-        /* Sağ Üst Oval Hap (Pill) Şeklinde Dil Butonu */
+        /* Sağ Üst Oval Hap Şeklinde Dil Butonu */
         #lang-container { position: absolute; top: 20px; right: 24px; z-index: 2000; }
         #lang-btn { 
             background: rgba(28, 28, 30, 0.85); 
@@ -114,7 +115,6 @@
         }
         #lang-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
         
-        /* 10 Dil İçin Kaydırılabilir Şık Menü */
         #lang-menu { 
             display: none; 
             position: absolute; 
@@ -160,7 +160,7 @@
         /* Mobil Uyum */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            #sidebar { width: 100%; height: 45vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            #sidebar { width: 100%; min-width: 100%; height: 45vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
             #map { height: 55vh; }
         }
     </style>
@@ -187,7 +187,6 @@
     <div id="sidebar">
         <div class="sidebar-header">
             <h1 id="ui-title">Türk Edebiyatı Atlası</h1>
-            <p id="ui-subtitle">TÜBİTAK 2209-A Projesi</p>
         </div>
         <div class="work-list" id="workList"></div>
     </div>
@@ -198,16 +197,16 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const uiTexts = {
-            tr: { title: "Türk Edebiyatı Atlası", subtitle: "TÜBİTAK 2209-A Projesi", loc: "Mekân:" },
-            en: { title: "Turkish Literature Atlas", subtitle: "TUBITAK 2209-A Project", loc: "Location:" },
-            fr: { title: "Atlas de Littérature Turque", subtitle: "Projet TUBITAK 2209-A", loc: "Lieu:" },
-            ar: { title: "أطلس الأدب التركي", subtitle: "مشروع TÜBİTAK 2209-A", loc: "الموقع:" },
-            fa: { title: "اتلس ادبیات ترکی", subtitle: "پروژه TÜBİTAK 2209-A", loc: "مکان:" },
-            zh: { title: "土耳其文学地图集", subtitle: "TÜBİTAK 2209-A 项目", loc: "地点：" },
-            de: { title: "Türkischer Literaturatlas", subtitle: "TÜBİTAK 2209-A Projekt", loc: "Ort:" },
-            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", subtitle: "Έργο TÜBİTAK 2209-A", loc: "Τοποθεσία:" },
-            ja: { title: "トルコ文学アトラス", subtitle: "TÜBİTAK 2209-A プロジェクト", loc: "場所：" },
-            hi: { title: "तुर्की साहित्य एटलस", subtitle: "TÜBİTAK 2209-A परियोजना", loc: "स्थान:" }
+            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:" },
+            en: { title: "Turkish Literature Atlas", loc: "Location:" },
+            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:" },
+            ar: { title: "أطلس الأدب التركي", loc: "الموقع:" },
+            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:" },
+            zh: { title: "土耳其文学地图集", loc: "地点：" },
+            de: { title: "Türkischer Literaturatlas", loc: "Ort:" },
+            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:" },
+            ja: { title: "トルコ文学アトラス", loc: "場所：" },
+            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:" }
         };
 
         const literaryData = [
@@ -238,7 +237,7 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी。"
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
@@ -254,7 +253,7 @@
                 },
                 locationName: { 
                     tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)", 
-                    ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्كيसेहिर)" 
+                    ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्किसेहिर)" 
                 },
                 lat: 39.4447,
                 lng: 31.5369,
@@ -370,11 +369,22 @@
 
         let currentLang = 'tr';
 
-        const map = L.map('map', { zoomControl: false }).setView([39.1667, 35.3333], 6);
+        // Haritayı optimize edilmiş tampon bellek (keepBuffer) ile başlatıyoruz
+        const map = L.map('map', { 
+            zoomControl: false,
+            fadeAnimation: true,
+            zoomAnimation: true,
+            markerZoomAnimation: true
+        }).setView([39.1667, 35.3333], 6);
+
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+        // Karo yükleme hatalarını önleyen ve akıcılık sağlayan ayarlar
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
+            keepBuffer: 8, // Ekran dışındaki karoları hafızada tutarak boşluk kalmasını engeller
+            updateWhenIdle: false, // Kaydırma esnasında anlık yükleme sağlar
+            updateWhenZooming: false,
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
@@ -398,7 +408,6 @@
 
         function renderApp() {
             document.getElementById('ui-title').innerText = uiTexts[currentLang].title;
-            document.getElementById('ui-subtitle').innerText = uiTexts[currentLang].subtitle;
 
             const workListContainer = document.getElementById('workList');
             workListContainer.innerHTML = '';
@@ -437,6 +446,9 @@
 
                 workListContainer.appendChild(card);
             });
+            
+            // Haritanın boyutsal oturmasını zorla tetikle
+            setTimeout(function() { map.invalidateSize(); }, 200);
         }
 
         renderApp();
