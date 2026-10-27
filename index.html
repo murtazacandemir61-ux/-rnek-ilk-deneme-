@@ -63,7 +63,7 @@
     <!-- Leaflet Harita Kütüphanesi JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Görsel Destekli Eser ve Mekân Veri Tabanımız
+        // Her Eserin Kendi Görseliyle Tanımlandığı Veri Tabanı
         const literaryData = [
             {
                 id: 1,
@@ -73,7 +73,7 @@
                 lat: 40.1885,
                 lng: 29.0610,
                 quote: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Bursa_from_Citadel_Walls.jpg/800px-Bursa_from_Citadel_Walls.jpg"
+                image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
             {
                 id: 2,
@@ -120,10 +120,9 @@
         // Haritayı Başlat (Türkiye Odaklı)
         const map = L.map('map').setView([39.1667, 35.3333], 6);
 
-        // Şık Karanlık Harita Katmanı (CartoDB Dark Matter)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
+        // Standart, Kesintisiz ve %100 Ücretsiz OpenStreetMap Katmanı
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(map);
 
@@ -132,7 +131,7 @@
 
         // Eserleri Listele ve Haritaya Pin Ekle
         literaryData.forEach(item => {
-            // Sol menü için kart oluştur (Görsel Dahil)
+            // Sol menü için kart oluştur
             const card = document.createElement('div');
             card.className = 'work-card';
             card.innerHTML = `
@@ -143,7 +142,7 @@
                 <p>"${item.quote}"</p>
             `;
 
-            // Harita üzerine pin ve popup ekle (Görsel Dahil)
+            // Harita üzerine pin ve popup ekle
             const marker = L.marker([item.lat, item.lng]).addTo(map);
             marker.bindPopup(`
                 <b>${item.title}</b><br>
