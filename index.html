@@ -53,7 +53,7 @@
         .work-list::-webkit-scrollbar { width: 6px; }
         .work-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
 
-        /* Apple Yumuşak Dokulu Kartlar (Tactile Cards) */
+        /* Apple Yumuşak Dokulu Kartlar */
         .work-card { 
             background: var(--card-bg); 
             backdrop-filter: blur(10px);
@@ -81,7 +81,6 @@
         /* Harita Alanı */
         #map { flex: 1; height: 100%; background-color: #0b0b0d; }
         
-        /* Harita Popup Özelleştirmesi (Apple Tarzı) */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: rgba(28, 28, 30, 0.9) !important;
             backdrop-filter: blur(20px) !important;
@@ -102,7 +101,7 @@
             border: 1px solid var(--border-glass); 
             padding: 8px 18px; 
             height: 42px; 
-            border-radius: 21px; /* Oval / Hap biçimi */
+            border-radius: 21px; 
             cursor: pointer; 
             font-size: 0.9rem; 
             font-weight: 500;
@@ -114,31 +113,39 @@
             transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
         }
         #lang-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
+        
+        /* 10 Dil İçin Kaydırılabilir Şık Menü */
         #lang-menu { 
             display: none; 
             position: absolute; 
             right: 0; 
             top: 52px; 
-            background: rgba(28, 28, 30, 0.9); 
+            background: rgba(28, 28, 30, 0.95); 
             backdrop-filter: blur(25px); 
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border-glass); 
             border-radius: 14px; 
-            overflow: hidden; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            width: 140px; 
+            overflow-y: auto; 
+            max-height: 320px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+            width: 160px; 
             padding: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
         }
+        #lang-menu::-webkit-scrollbar { width: 5px; }
+        #lang-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         #lang-menu.show { display: block; animation: fadeIn 0.2s ease; }
+        
         .lang-option { 
-            padding: 10px 14px; 
+            padding: 9px 12px; 
             color: var(--text-primary); 
             background: none; 
             border: none; 
             width: 100%; 
             text-align: left; 
             cursor: pointer; 
-            font-size: 0.9rem; 
+            font-size: 0.85rem; 
             border-radius: 8px;
             transition: background 0.15s;
             font-weight: 500;
@@ -167,6 +174,13 @@
             <button class="lang-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
             <button class="lang-option" onclick="setLanguage('en')">🇬🇧 English</button>
             <button class="lang-option" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            <button class="lang-option" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+            <button class="lang-option" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
+            <button class="lang-option" onclick="setLanguage('zh')">🇨🇳 中文</button>
+            <button class="lang-option" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+            <button class="lang-option" onclick="setLanguage('el')">🇬🇷 Ελληνικά</button>
+            <button class="lang-option" onclick="setLanguage('ja')">🇯🇵 日本語</button>
+            <button class="lang-option" onclick="setLanguage('hi')">🇮🇳 हिन्दी</button>
         </div>
     </div>
 
@@ -186,82 +200,169 @@
         const uiTexts = {
             tr: { title: "Türk Edebiyatı Atlası", subtitle: "TÜBİTAK 2209-A Projesi", loc: "Mekân:" },
             en: { title: "Turkish Literature Atlas", subtitle: "TUBITAK 2209-A Project", loc: "Location:" },
-            fr: { title: "Atlas de Littérature Turque", subtitle: "Projet TUBITAK 2209-A", loc: "Lieu:" }
+            fr: { title: "Atlas de Littérature Turque", subtitle: "Projet TUBITAK 2209-A", loc: "Lieu:" },
+            ar: { title: "أطلس الأدب التركي", subtitle: "مشروع TÜBİTAK 2209-A", loc: "الموقع:" },
+            fa: { title: "اتلس ادبیات ترکی", subtitle: "پروژه TÜBİTAK 2209-A", loc: "مکان:" },
+            zh: { title: "土耳其文学地图集", subtitle: "TÜBİTAK 2209-A 项目", loc: "地点：" },
+            de: { title: "Türkischer Literaturatlas", subtitle: "TÜBİTAK 2209-A Projekt", loc: "Ort:" },
+            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", subtitle: "Έργο TÜBİTAK 2209-A", loc: "Τοποθεσία:" },
+            ja: { title: "トルコ文学アトラス", subtitle: "TÜBİTAK 2209-A プロジェクト", loc: "場所：" },
+            hi: { title: "तुर्की साहित्य एटलस", subtitle: "TÜBİTAK 2209-A परियोजना", loc: "स्थान:" }
         };
 
         const literaryData = [
             {
                 id: 1,
-                title: { tr: "Çalıkuşu", en: "The Wren", fr: "L'Oiselle" },
-                author: { tr: "Reşat Nuri Güntekin", en: "Reşat Nuri Güntekin", fr: "Reşat Nuri Güntekin" },
-                locationName: { tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)" },
+                title: { 
+                    tr: "Çalıkuşu", en: "The Wren", fr: "L'Oiselle", 
+                    ar: "طائر الدبس", fa: "چکاوک", zh: "鹪鹩", de: "Der Buchfink", el: "Τσαλουκούσου", ja: "チャルクシュ", hi: "चलिकुशु" 
+                },
+                author: { 
+                    tr: "Reşat Nuri Güntekin", en: "Reşat Nuri Güntekin", fr: "Reşat Nuri Güntekin", 
+                    ar: "رشاد نوري غونتكين", fa: "رشاد نوری گون تکین", zh: "雷沙特·努里·金特金", de: "Reşat Nuri Güntekin", el: "Ρεσάτ Νουρί Γκουντεκίν", ja: "レシャト・ヌリ・ギュンテキン", hi: "रेशाट नूरी गुन्तेकिन" 
+                },
+                locationName: { 
+                    tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)", 
+                    ar: "قرية زينيلير (بورصة)", fa: "روستای زینیلر (بورسا)", zh: "泽伊尼勒村 (布尔萨)", de: "Dorf Zeyniler (Bursa)", el: "Χωριό Ζεινιλέρ (Προύσα)", ja: "ゼイニレル村 (ブルサ)", hi: "ज़ेयनिलेर गाँव (बुर्सा)" 
+                },
                 lat: 40.1885,
                 lng: 29.0610,
                 emoji: "🌳",
                 quote: {
                     tr: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
                     en: "Zeyniler village was a quiet place surrounded by walnut trees at the end of a winding slope coming down from the mountain.",
-                    fr: "Le village de Zeyniler était un endroit calme entouré de noyers au bout d'une pente sinueuse descendant de la montagne."
+                    fr: "Le village de Zeyniler était un endroit calme entouré de noyers au bout d'une pente sinueuse descendant de la montagne.",
+                    ar: "كانت قرية زينيلير مكاناً هادئاً تحيط به شجر الجوز في نهاية منحدر متعرج ينزل من الجبل.",
+                    fa: "روستای زینیلر جایی آرام بود که در انتهای یک سراشیبی پرپیچ و خم از کوه، با درختان گردو احاطه شده بود.",
+                    zh: "泽伊尼勒村是一个安静的地方，四周环绕着核桃树，位于山间蜿蜒下坡的尽头。",
+                    de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
+                    el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
+                    ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
             {
                 id: 2,
-                title: { tr: "Yaban", en: "The Alien / The Stranger", fr: "L'Étranger (Yaban)" },
-                author: { tr: "Yakup Kadri Karaosmanoğlu", en: "Yakup Kadri Karaosmanoğlu", fr: "Yakup Kadri Karaosmanoğlu" },
-                locationName: { tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)" },
+                title: { 
+                    tr: "Yaban", en: "The Stranger", fr: "L'Étranger", 
+                    ar: "الأجنبي (ياباني)", fa: "بیگانه (یابان)", zh: "异乡人", de: "Der Fremde", el: "Ο Ξένος", ja: "異邦人", hi: "अजनबी" 
+                },
+                author: { 
+                    tr: "Yakup Kadri Karaosmanoğlu", en: "Yakup Kadri Karaosmanoğlu", fr: "Yakup Kadri Karaosmanoğlu", 
+                    ar: "يعقوب قادري قره عثمان أوغلو", fa: "یعقوب قدری کاراوسمان‌اوغلو", zh: "雅库普·卡德里·卡拉奥斯马诺格卢", de: "Yakup Kadri Karaosmanoğlu", el: "Γιακούπ Καντρί Καραοσμανογλού", ja: "ヤクプ・カドリ・カラオスマノール", hi: "याकुप कादरी काराओस्मानोग्लू" 
+                },
+                locationName: { 
+                    tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)", 
+                    ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्كيसेहिर)" 
+                },
                 lat: 39.4447,
                 lng: 31.5369,
                 emoji: "💧",
                 quote: {
                     tr: "Bu köylüler, aydın kişinin uzattığı eli ısıracak kadar yaban ve yalnız bırakılmışlardı.",
                     en: "These villagers had been left so wild and alone that they would bite the hand extended by the intellectual.",
-                    fr: "Ces villageois avaient été laissés si sauvages et seuls qu'ils mordaient la main tendue par l'intellectuel."
+                    fr: "Ces villageois avaient été laissés si sauvages et seuls qu'ils mordaient la main tendue.",
+                    ar: "ترك هؤلاء القرويون متوحشين ووحيدين لدرجة أنهم يعضون يد المثقف الممتدة.",
+                    fa: "این روستاییان چنان وحشی و تنها رها شده بودند که دست دراز شده روشنفکر را گاز می‌گرفتند.",
+                    zh: "这些村民被遗弃得如此野蛮和孤独，以至于他们会咬知识分子伸出的手。",
+                    de: "Diese Dorfbewohner waren so wild und einsam gelassen worden, dass sie die Hand des Intellektuellen bissen.",
+                    el: "Αυτοί οι χωρικοί είχαν αεθεί τόσο άγριοι και μόνοι που δαγκωναν το χέρι.",
+                    ja: "これらの村人たちは非常に野生で孤独に放置されており、知識人の差し出した手を噛むほどでした。",
+                    hi: "इन ग्रामवासियों को इतना जंगली और अकेला छोड़ दिया गया था कि वे बुद्धिजीवी द्वारा बढ़ाए गए हाथ को काट लेते।"
                 },
                 image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800"
             },
             {
                 id: 3,
-                title: { tr: "Saatleri Ayarlama Enstitüsü", en: "The Time Regulation Institute", fr: "L'Institut de Régulation des Heures" },
-                author: { tr: "Ahmet Hamdi Tanpınar", en: "Ahmet Hamdi Tanpınar", fr: "Ahmet Hamdi Tanpınar" },
-                locationName: { tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)" },
+                title: { 
+                    tr: "Saatleri Ayarlama Enstitüsü", en: "The Time Regulation Institute", fr: "L'Institut de Régulation des Heures", 
+                    ar: "معهد ضبط الساعات", fa: "مؤسسه تنظیم ساعت", zh: "时钟调节研究所", de: "Das Institut zur Uhrenregulierung", el: "Ινστιτούτο Ρύθμισης Ωρολογίων", ja: "時計調整研究所", hi: "समय विनियमन संस्थान" 
+                },
+                author: { 
+                    tr: "Ahmet Hamdi Tanpınar", en: "Ahmet Hamdi Tanpınar", fr: "Ahmet Hamdi Tanpınar", 
+                    ar: "أحمد حمدي طانبنار", fa: "احمد حمدی طانپینار", zh: "艾哈迈德·哈姆迪·坦皮纳尔", de: "Ahmet Hamdi Tanpınar", el: "Αχμέτ Χαμντί Τανπινάρ", ja: "アフメト・ハムディ・タンピナル", hi: "अहमद हम्दी तानपिनार" 
+                },
+                locationName: { 
+                    tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)", 
+                    ar: "شهزاده باشي (إسطنبول)", fa: "شاهزاده‌باشی (استانبول)", zh: "谢扎德巴什 (伊斯坦布尔)", de: "Şehzadebaşı (Istanbul)", el: "Şehzadebaşı (Κωνσταντινούπολη)", ja: "シェフザーデバシュ (イスタンブール)", hi: "शेहजादेबासी (इस्तांबुल)" 
+                },
                 lat: 41.0082,
                 lng: 28.9784,
                 emoji: "⏰",
                 quote: {
                     tr: "Şehzadebaşı'nın o eski, huzurlu ramazan akşamlarında saat sesleri insanı zamanın dışına taşıardı.",
                     en: "In those old, peaceful Ramadan evenings of Şehzadebaşı, the sounds of clocks carried a person outside of time.",
-                    fr: "En ces vieux et paisibles soirs de Ramadan à Şehzadebaşı, le son des horloges transportait l'homme hors du temps."
+                    fr: "En ces vieux et paisibles soirs de Ramadan à Şehzadebaşı, le son des horloges transportait l'homme hors du temps.",
+                    ar: "في تلك الأمسيات الرمضانية القديمة الهادئة في شهزاده باشي، كانت أصوات الساعات تنقل الإنسان خارج الزمن.",
+                    fa: "در آن شامگاهان آرام و قدیمی ماه رمضان در شاهزاده‌باشی، صدای ساعت‌ها انسان را به خارج از زمان می‌برد.",
+                    zh: "在谢扎德巴什那些古老而宁静的斋月夜晚，钟声将人带到了时间之外。",
+                    de: "In jenen alten, friedlichen Ramadan-Abenden von Şehzadebaşı trugen die Uhrengeräusche den Menschen aus der Zeit.",
+                    el: "Σε εκείνα τα παλιά, ειρηνικά βράδια του Ραμαζανιού στο Şehzadebaşı, οι ήχοι των ρολογιών μετέφεραν τον άνθρωπο έξω από τον χρόνο.",
+                    ja: "シェフザーデバシュの古く平和なラマダンの夕べには、時計の音が人を時間の外へと運んでいきました。",
+                    hi: "शेहजादेबासी की उन पुरानी, शांत रमजान की शामों में घड़ियों की आवाजें इंसान को समय से बाहर ले जाती थीं।"
                 },
                 image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800"
             },
             {
                 id: 4,
-                title: { tr: "İnce Memed", en: "Memed, My Hawk", fr: "Memed le Migre" },
-                author: { tr: "Yaşar Kemal", en: "Yaşar Kemal", fr: "Yaşar Kemal" },
-                locationName: { tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)" },
+                title: { 
+                    tr: "İnce Memed", en: "Memed, My Hawk", fr: "Memed le Migre", 
+                    ar: "إينجه ميميد", fa: "مهمد لاغر / اینجه ممید", zh: "瘦子梅梅德", de: "Ince Memed", el: "Ιντζέ Μεμέτ", ja: "インジェ・メメト", hi: "इन्से मेमेद" 
+                },
+                author: { 
+                    tr: "Yaşar Kemal", en: "Yaşar Kemal", fr: "Yaşar Kemal", 
+                    ar: "ياشار كمال", fa: "یاشار کمال", zh: "亚沙尔·凯末尔", de: "Yaşar Kemal", el: "Γιασάρ Κεμάλ", ja: "ヤシャル・ケマル", hi: "यासार केमाल" 
+                },
+                locationName: { 
+                    tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)", 
+                    ar: "تشوكوروفا / جبال توروس (اضنة)", fa: "چوکورووا / کوه‌های توروس (آدانا)", zh: "丘库罗瓦 / 金牛座山脉 (阿达纳)", de: "Çukurova / Taurusgebirge (Adana)", el: "Τσουקורόβα / Όρη Ταύρος (Άδανα)", ja: "チュクロヴァ / トロス山脈 (アダナ)", hi: "चुकुरोवा / टॉरस पर्वत (अदाना)" 
+                },
                 lat: 37.0000,
                 lng: 35.3213,
                 emoji: "☀️",
                 quote: {
                     tr: "Çukurova yanıyor, demir gibi kızıyordu. Toroslar'ın ardında ise bambaşka bir dünya esiyordu.",
                     en: "Çukurova was burning, glowing like iron. Behind the Taurus Mountains, a completely different world was blowing.",
-                    fr: "Çukurova brûlait, rougeoyant comme du fer. Derrière les monts Taurus soufflait un monde complètement différent."
+                    fr: "Çukurova brûlait, rougeoyant comme du fer. Derrière les monts Taurus soufflait un monde complètement différent.",
+                    ar: "كانت تشوكوروفا تحترق وتتوهج مثل الحديد. وخلف جبال توروس، كان هواء عالم مختلف تماماً يهب.",
+                    fa: "چوکورووا می‌سوخت و مانند آهن سرخ می‌شد. در پشت کوه‌های توروس نیز دنیایی کاملاً متفاوت می‌وزید.",
+                    zh: "丘库罗瓦在燃烧，像铁一样发红。在金牛座山脉背后，吹拂着一个完全不同的世界。",
+                    de: "Çukurova brannte und glühte wie Eisen. Hinter dem Taurusgebirge wehte eine völlig andere Welt.",
+                    el: "Η Τσουקורόβα φλεγόταν. Πίσω από τα Όρη Ταύρος φυσούσε ένας εντελώς διαφορετικός κόσμος.",
+                    ja: "チュクロヴァは燃え上がり、鉄のように赤くなっていました。ロス山脈の向こうにはまったく異なる世界が吹いていました。",
+                    hi: "चुकुरोवा जल रहा था, लोहे की तरह तप रहा था। टॉरस पर्वतों के पीछे एक बिल्कुल अलग दुनिया बह रही थी।"
                 },
                 image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
             },
             {
                 id: 5,
-                title: { tr: "Seyahatname", en: "Book of Travels", fr: "Livre des Voyages" },
-                author: { tr: "Evliya Çelebi", en: "Evliya Çelebi", fr: "Evliya Çelebi" },
-                locationName: { tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)" },
+                title: { 
+                    tr: "Seyahatname", en: "Book of Travels", fr: "Livre des Voyages", 
+                    ar: "سياحتنامة (رحلات أولياء جلبي)", fa: "سیاحت‌نامه اولیاء چلبی", zh: "旅行记", de: "Seyahatname", el: "Σεγιαχατνάμε (Βιβλίο Ταξιδίων)", ja: "旅行記 (セヤハトナメ)", hi: "सेयाहतनामे (यात्रा वृत्तांत)" 
+                },
+                author: { 
+                    tr: "Evliya Çelebi", en: "Evliya Çelebi", fr: "Evliya Çelebi", 
+                    ar: "أولياء جلبي", fa: "اولیاء چلبی", zh: "爱维利亚·切莱比", de: "Evliya Çelebi", el: "Εβλιγιά Τσελεμπί", ja: "エヴリヤ・チェレビ", hi: "एवलिया सेलेबी" 
+                },
+                locationName: { 
+                    tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)", 
+                    ar: "جامع السليمية (أدرنة)", fa: "مسجد سلیمیه (ادرنه)", zh: "塞利米耶清真寺 (埃迪尔内)", de: "Selimiye-Moschee (Edirne)", el: "Τζαμί Σελινιγιέ (Αδριανούπολη)", ja: "セリミエ・モスク (エディルネ)", hi: "सेलिमीये मस्जिद (एदिर्ने)" 
+                },
                 lat: 41.6771,
                 lng: 26.5557,
                 emoji: "🕌",
                 quote: {
                     tr: "Edirne şehri rûy-i zemin cennetinden bir köşedir. Mimar Sinan'ın kalfalık eserim dediği Selimiye cihanın göz bebeğidir.",
                     en: "The city of Edirne is a corner from the paradise of the earth. Selimiye, which Mimar Sinan called his journeyman piece, is the apple of the world's eye.",
-                    fr: "La ville d'Edirne est un coin du paradis terrestre. Selimiye, que Mimar Sinan appelait son œuvre de compagnon, est la prunelle des yeux du monde."
+                    fr: "La ville d'Edirne est un coin du paradis terrestre. Selimiye, que Mimar Sinan appelait son œuvre de compagnon, est la prunelle des yeux du monde.",
+                    ar: "مدينة أدرنة هي ركن من جنة الأرض. والسليمية التي وصفها معمار سنان بأنها تحفة هي قرة عين العالم.",
+                    fa: "شهر ادرنه گوشه‌ای از بهشت روی زمین است. سلیمیه که معمار سنان آن را شاهکار دوره استادکاری‌اش نامیده، نور چشم جهان است.",
+                    zh: "埃迪尔内市是地球天堂的一个角落。被米马尔·希нан称为其代表作的塞利米耶是世界的掌上明珠。",
+                    de: "Die Stadt Edirne ist eine Ecke aus dem Paradies der Erde. Selimiye, das Mimar Sinan sein Meisterwerk nannte, ist der Augapfel der Welt.",
+                    el: "Η πόλη της Αδριανούπολης είναι μια γωνιά από τον παράδεισο της γης. Το Σελινιγιέ είναι η κόρη των οφθαλμών του κόσμου.",
+                    ja: "エディルネの街は地上の楽園の一隅です。ミマル・スィナンが代表作と呼んだセリミエは世界の見果てぬ夢です。",
+                    hi: "एदिर्ने शहर पृथ्वी के स्वर्ग का एक कोना है। सेलिमीये, जिसे मीमार सिनान ने अपनी उत्कृष्ट कृति कहा, दुनिया की आँख का तारा है।"
                 },
                 image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800"
             }
@@ -316,7 +417,6 @@
                                  '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
                                  '<p>"' + item.quote[currentLang] + '"</p>';
 
-                // Özel Emoji Pin Tasarımı (Sıvı Cam Estetiğinde)
                 const emojiIcon = L.divIcon({
                     className: 'custom-emoji-pin',
                     html: '<div style="background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s;">' + item.emoji + '</div>',
