@@ -57,12 +57,76 @@
             box-shadow: 20px 0 50px rgba(0,0,0,0.5);
         }
         .sidebar-header { 
-            padding: 24px; 
+            padding: 20px 24px; 
             border-bottom: 1px solid var(--border-glass); 
             background: rgba(28, 28, 30, 0.4); 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            position: relative;
         }
-        .sidebar-header h1 { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+        .sidebar-header h1 { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; white-space: nowrap; }
         
+        /* Sol Bölme Sağ Üst Arama Kutusu (Google Tarzı) */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 180px;
+        }
+        .search-input {
+            width: 100%;
+            background: rgba(20, 20, 22, 0.8);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 7px 12px 7px 32px;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--accent-color);
+            background: rgba(30, 30, 35, 0.9);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.85rem;
+            pointer-events: none;
+            color: var(--text-secondary);
+        }
+        .search-suggestions {
+            display: none;
+            position: absolute;
+            top: 38px;
+            left: 0;
+            width: 100%;
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 3000;
+        }
+        .search-suggestions.show { display: block; }
+        .suggestion-item {
+            padding: 9px 12px;
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+        }
+        .suggestion-item:hover {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-color);
+        }
+
         .work-list { overflow-y: auto; flex: 1; padding: 16px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent; }
         .work-list::-webkit-scrollbar { width: 6px; }
         .work-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
@@ -80,11 +144,11 @@
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
-        .work-card:hover { 
+        .work-card:hover, .work-card.highlight { 
             background: var(--card-hover); 
             transform: translateY(-3px); 
             box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            border-color: rgba(245, 158, 11, 0.3);
+            border-color: rgba(245, 158, 11, 0.5);
         }
         .work-card h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; }
         .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; }
@@ -229,7 +293,7 @@
 
     <!-- Sağ Üst Kontroller -->
     <div class="top-controls">
-        <!-- Yazı Stili Butonu (İki Sütunlu) -->
+        <!-- Yazı Stili Butonu -->
         <div style="position: relative;" id="font-container">
             <button class="pill-btn" onclick="toggleFontMenu()" id="font-style-btn">🔤 Yazı Stili</button>
             <div id="font-style-menu" class="dropdown-menu">
@@ -237,7 +301,6 @@
                     <div class="menu-column-title" id="lbl-font">Yazı Tipi</div>
                     <button class="dropdown-option font-opt active" onclick="setFontFamily('default', this)">Varsayılan</button>
                     <button class="dropdown-option font-opt" onclick="setFontFamily('rosemary', this)">Rosemary</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('cooljazz', this)">Cool Jazz</button>
                     <button class="dropdown-option font-opt" onclick="setFontFamily('roboto', this)">Roboto</button>
                     <button class="dropdown-option font-opt" onclick="setFontFamily('playfair', this)">Playfair</button>
                 </div>
@@ -280,6 +343,12 @@
     <div id="sidebar">
         <div class="sidebar-header">
             <h1 id="ui-title">Türk Edebiyatı Atlası</h1>
+            <!-- Sol Bölme Sağ Üst Arama Kutusu -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="workSearchInput" class="search-input" placeholder="Eser ara..." oninput="handleSearchInput(this.value)">
+                <div id="searchSuggestions" class="search-suggestions"></div>
+            </div>
         </div>
         <div class="work-list" id="workList"></div>
     </div>
@@ -290,16 +359,16 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const uiTexts = {
-            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu", fontStyle: "🔤 Yazı Stili", fontTitle: "Yazı Tipi", weightTitle: "Kalınlık", normal: "Normal", bold: "Kalın" },
-            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style", fontStyle: "🔤 Font Style", fontTitle: "Font Family", weightTitle: "Weight", normal: "Normal", bold: "Bold" },
-            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte", fontStyle: "🔤 Style de Police", fontTitle: "Police", weightTitle: "Épaisseur", normal: "Normal", bold: "Gras" },
-            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة", fontStyle: "🔤 نمط الخط", fontTitle: "نوع الخط", weightTitle: "السمك", normal: "عادي", bold: "عريض" },
-            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه", fontStyle: "🔤 سبک قلم", fontTitle: "نوع قلم", weightTitle: "ضخامت", normal: "معمولی", bold: "ضخیم" },
-            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式", fontStyle: "🔤 字体样式", fontTitle: "字体", weightTitle: "字重", normal: "常规", bold: "加粗" },
-            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil", fontStyle: "🔤 Schriftstil", fontTitle: "Schriftart", weightTitle: "Stärke", normal: "Normal", bold: "Fett" },
-            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη", fontStyle: "🔤 Στυλ Γραμματοσειράς", fontTitle: "Γραμματοσειρά", weightTitle: "Πάχος", normal: "Κανονικό", bold: "Έντονο" },
-            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル", fontStyle: "🔤 フォントスタイル", fontTitle: "フォント", weightTitle: "太さ", normal: "標準", bold: "太字" },
-            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली", fontStyle: "🔤 फ़ॉन्ट शैली", fontTitle: "फ़ॉन्ट", weightTitle: "मोटाई", normal: "सामान्य", bold: "बोल्ड" }
+            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu", fontStyle: "🔤 Yazı Stili", fontTitle: "Yazı Tipi", weightTitle: "Kalınlık", normal: "Normal", bold: "Kalın", searchPlaceholder: "Eser ara..." },
+            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style", fontStyle: "🔤 Font Style", fontTitle: "Font Family", weightTitle: "Weight", normal: "Normal", bold: "Bold", searchPlaceholder: "Search work..." },
+            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte", fontStyle: "🔤 Style de Police", fontTitle: "Police", weightTitle: "Épaisseur", normal: "Normal", bold: "Gras", searchPlaceholder: "Rechercher..." },
+            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة", fontStyle: "🔤 نمط الخط", fontTitle: "نوع الخط", weightTitle: "السمك", normal: "عادي", bold: "عريض", searchPlaceholder: "بحث عن عمل..." },
+            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه", fontStyle: "🔤 سبک قلم", fontTitle: "نوع قلم", weightTitle: "ضخامت", normal: "معمولی", bold: "ضخیم", searchPlaceholder: "جستجوی اثر..." },
+            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式", fontStyle: "🔤 字体样式", fontTitle: "字体", weightTitle: "字重", normal: "常规", bold: "加粗", searchPlaceholder: "搜索作品..." },
+            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil", fontStyle: "🔤 Schriftstil", fontTitle: "Schriftart", weightTitle: "Stärke", normal: "Normal", bold: "Fett", searchPlaceholder: "Werk suchen..." },
+            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη", fontStyle: "🔤 Στυλ Γραμματοσειράς", fontTitle: "Γραμματοσειρά", weightTitle: "Πάχος", normal: "Κανονικό", bold: "Έντονο", searchPlaceholder: "Αναζήτηση..." },
+            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル", fontStyle: "🔤 フォントスタイル", fontTitle: "フォント", weightTitle: "太さ", normal: "標準", bold: "太字", searchPlaceholder: "作品を検索..." },
+            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली", fontStyle: "🔤 फ़ॉन्ट शैली", fontTitle: "फ़ॉन्ट", weightTitle: "मोटाई", normal: "सामान्य", bold: "बोल्ड", searchPlaceholder: "कृति खोजें..." }
         };
 
         const literaryData = [
@@ -319,7 +388,7 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी."
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
@@ -425,6 +494,7 @@
 
         let currentLayer = layers.standard.addTo(map);
         let markersLayer = {};
+        let cardElementsMap = {};
 
         // Menü Kontrolleri
         function toggleFontMenu() {
@@ -432,18 +502,21 @@
             menu.classList.toggle('show');
             document.getElementById('map-menu').classList.remove('show');
             document.getElementById('lang-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
         }
 
         function toggleMapMenu() {
             document.getElementById('map-menu').classList.toggle('show');
             document.getElementById('font-style-menu').classList.remove('show');
             document.getElementById('lang-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
         }
 
         function toggleLangMenu() {
             document.getElementById('lang-menu').classList.toggle('show');
             document.getElementById('font-style-menu').classList.remove('show');
             document.getElementById('map-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
         }
 
         window.addEventListener('click', function(e) {
@@ -455,6 +528,9 @@
             }
             if (!e.target.closest('#map-mode-btn') && !e.target.closest('#map-menu')) {
                 document.getElementById('map-menu').classList.remove('show');
+            }
+            if (!e.target.closest('.search-container')) {
+                document.getElementById('searchSuggestions').classList.remove('show');
             }
         });
 
@@ -470,11 +546,9 @@
             document.getElementById('map-menu').classList.remove('show');
         }
 
-        // Güvenli Font Değiştirme Fonksiyonu (Donma / Hata Oranı Sıfır)
         function setFontFamily(fontKey, btnElement) {
             let fontValue = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
             if (fontKey === 'rosemary') fontValue = '"Rosemary", cursive, sans-serif';
-            if (fontKey === 'cooljazz') fontValue = '"Cool Jazz", cursive, sans-serif';
             if (fontKey === 'roboto') fontValue = '"Roboto", sans-serif';
             if (fontKey === 'playfair') fontValue = '"Playfair Display", serif';
 
@@ -489,12 +563,61 @@
             btnElement.classList.add('active');
         }
 
+        // Arama ve Anlık Tamamlama (Autocomplete) İşlevselliği
+        function handleSearchInput(query) {
+            const suggestionsBox = document.getElementById('searchSuggestions');
+            suggestionsBox.innerHTML = '';
+            
+            if (!query.trim()) {
+                suggestionsBox.classList.remove('show');
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            const matches = literaryData.filter(item => {
+                const title = item.title[currentLang] || item.title['tr'];
+                return title.toLowerCase().includes(lowerQuery);
+            });
+
+            if (matches.length > 0) {
+                matches.forEach(item => {
+                    const title = item.title[currentLang] || item.title['tr'];
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.innerText = title;
+                    div.onclick = function() {
+                        selectWork(item.id, title);
+                    };
+                    suggestionsBox.appendChild(div);
+                });
+                suggestionsBox.classList.add('show');
+            } else {
+                suggestionsBox.classList.remove('show');
+            }
+        }
+
+        function selectWork(id, title) {
+            document.getElementById('workSearchInput').value = title;
+            document.getElementById('searchSuggestions').classList.remove('show');
+
+            // Sol menüdeki ilgili karta odaklan
+            const card = cardElementsMap[id];
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('highlight');
+                setTimeout(() => {
+                    card.classList.remove('highlight');
+                }, 1500);
+            }
+        }
+
         function renderApp() {
             document.getElementById('ui-title').innerText = uiTexts[currentLang].title;
             document.getElementById('font-style-btn').innerText = uiTexts[currentLang].fontStyle;
             document.getElementById('map-mode-btn').innerText = uiTexts[currentLang].mapMode;
             document.getElementById('lbl-font').innerText = uiTexts[currentLang].fontTitle;
             document.getElementById('lbl-weight').innerText = uiTexts[currentLang].weightTitle;
+            document.getElementById('workSearchInput').placeholder = uiTexts[currentLang].searchPlaceholder;
 
             const workListContainer = document.getElementById('workList');
             workListContainer.innerHTML = '';
@@ -503,6 +626,7 @@
                 map.removeLayer(markersLayer[id]);
             }
             markersLayer = {};
+            cardElementsMap = {};
 
             literaryData.forEach(function(item) {
                 const card = document.createElement('div');
@@ -512,6 +636,8 @@
                                  '<div class="location">📍 ' + item.locationName[currentLang] + '</div>' +
                                  '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
                                  '<p>"' + item.quote[currentLang] + '"</p>';
+
+                cardElementsMap[item.id] = card;
 
                 const emojiIcon = L.divIcon({
                     className: 'custom-emoji-pin',
