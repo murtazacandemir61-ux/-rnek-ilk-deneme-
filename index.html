@@ -86,7 +86,7 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.4);
             border-color: rgba(245, 158, 11, 0.3);
         }
-        .work-card h3 { font-size: 1.05rem; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .work-card h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; }
         .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; }
         .work-card .location { font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border-glass); }
         .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin: 6px 0 10px 0; display: block; border: 1px solid var(--border-glass); }
@@ -172,7 +172,7 @@
 
         /* İki Sütunlu Geniş Yazı Stili Paneli */
         #font-style-menu {
-            width: 320px;
+            width: 340px;
             display: none;
             padding: 12px;
             gap: 12px;
@@ -235,11 +235,11 @@
             <div id="font-style-menu" class="dropdown-menu">
                 <div class="menu-column">
                     <div class="menu-column-title" id="lbl-font">Yazı Tipi</div>
-                    <button class="dropdown-option font-opt active" onclick="setFontFamily('-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif', this)">Varsayılan</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('Rosemary, cursive, sans-serif', this)">Rosemary</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('Cool Jazz, cursive, sans-serif', this)">Cool Jazz</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily(\'Roboto\', sans-serif', this)">Roboto</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily(\'Playfair Display\', serif', this)">Playfair</button>
+                    <button class="dropdown-option font-opt active" onclick="setFontFamily('default', this)">Varsayılan</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('rosemary', this)">Rosemary</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('cooljazz', this)">Cool Jazz</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('roboto', this)">Roboto</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('playfair', this)">Playfair</button>
                 </div>
                 <div class="menu-column">
                     <div class="menu-column-title" id="lbl-weight">Kalınlık</div>
@@ -319,7 +319,7 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी."
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
@@ -470,8 +470,15 @@
             document.getElementById('map-menu').classList.remove('show');
         }
 
-        function setFontFamily(fontFamily, btnElement) {
-            document.documentElement.style.setProperty('--app-font', fontFamily);
+        // Güvenli Font Değiştirme Fonksiyonu (Donma / Hata Oranı Sıfır)
+        function setFontFamily(fontKey, btnElement) {
+            let fontValue = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            if (fontKey === 'rosemary') fontValue = '"Rosemary", cursive, sans-serif';
+            if (fontKey === 'cooljazz') fontValue = '"Cool Jazz", cursive, sans-serif';
+            if (fontKey === 'roboto') fontValue = '"Roboto", sans-serif';
+            if (fontKey === 'playfair') fontValue = '"Playfair Display", serif';
+
+            document.documentElement.style.setProperty('--app-font', fontValue);
             document.querySelectorAll('.font-opt').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
         }
