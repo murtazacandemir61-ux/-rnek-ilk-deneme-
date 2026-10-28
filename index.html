@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Türk Edebiyatı Mekân ve Rota Atlası</title>
-    <!-- Google Fonts (Roboto ve Playfair Display) -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <!-- Leaflet Harita Kütüphanesi CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -68,7 +68,7 @@
         }
         .sidebar-header h1 { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; white-space: nowrap; }
         
-        /* Sol Bölme Sağ Üst Arama Kutusu (Google Tarzı) */
+        /* Arama Kutusu */
         .search-container {
             position: relative;
             flex: 1;
@@ -159,6 +159,30 @@
         /* Harita Alanı */
         #map { flex-grow: 1; height: 100%; width: 100%; background-color: #0b0b0d; position: relative; }
         
+        /* Animasyonlu El Çizimi Ok Katmanı (SVG) */
+        #animation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2500;
+        }
+        .hand-drawn-arrow {
+            fill: none;
+            stroke: #f59e0b;
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawArrow 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+        }
+        @keyframes drawArrow {
+            to { stroke-dashoffset: 0; }
+        }
+
         /* Popup ve Kapatma Butonu Tasarımı */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: rgba(28, 28, 30, 0.95) !important;
@@ -353,7 +377,10 @@
         <div class="work-list" id="workList"></div>
     </div>
 
-    <div id="map"></div>
+    <!-- Harita ve El Çizimi Ok Animasyonu Katmanı -->
+    <div id="map">
+        <svg id="animation-overlay"></svg>
+    </div>
 
     <!-- Leaflet Harita Kütüphanesi JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -388,7 +415,7 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी."
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
@@ -408,7 +435,7 @@
                     de: "Diese Dorfbewohner waren so wild und einsam gelassen worden, dass sie die Hand des Intellektuellen bissen.",
                     el: "Αυτοί οι χωρικοί είχαν αεθεί τόσο άγριοι και μόνοι που δαγκωναν το χέρι.",
                     ja: "これらの村人たちは非常に野生で孤独に放置されており、知識人の差し出した手を噛むほどでした。",
-                    hi: "इन ग्रामवासियों को इतना जंगली और अकेला छोड़ दिया गया था कि वे बुद्धिजीवी द्वारा बढ़ाए गए हाथ को काट लेते।"
+                    hi: "इन ग्रामवासियों को इतना जंगली और अकेला छोड़ दिया गया था कि वे बुद्धिजीवी द्वारा बढ़ाए गए हाथ को काट लेते。"
                 },
                 image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800"
             },
@@ -600,7 +627,6 @@
             document.getElementById('workSearchInput').value = title;
             document.getElementById('searchSuggestions').classList.remove('show');
 
-            // Sol menüdeki ilgili karta odaklan
             const card = cardElementsMap[id];
             if (card) {
                 card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -609,6 +635,41 @@
                     card.classList.remove('highlight');
                 }, 1500);
             }
+        }
+
+        // Kart Tıklama ve Pime Doğru El Çizimi Ok Animasyonu
+        function triggerCardAnimation(item, cardElement) {
+            // Kartın ekran koordinatlarını al
+            const cardRect = cardElement.getBoundingClientRect();
+            const startX = cardRect.right;
+            const startY = cardRect.top + (cardRect.height / 2);
+
+            // Pimin harita üzerindeki pixel koordinatlarını al
+            const latLng = L.latLng(item.lat, item.lng);
+            const containerPoint = map.latLngToContainerPoint(latLng);
+            const endX = containerPoint.x;
+            const endY = containerPoint.y;
+
+            // Yumuşak el çizimi eğri (Bezier curve) oluştur
+            const controlX = startX + (endX - startX) * 0.5;
+            const controlY = Math.min(startY, endY) - 50; // Hafif yukarı kavisli el çizimi hissi
+            const pathData = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
+
+            // SVG katmanına çizgiyi ekle
+            const svg = document.getElementById('animation-overlay');
+            svg.innerHTML = `<path class="hand-drawn-arrow" d="${pathData}" />`;
+
+            // Animasyon süresi bitiminde (0.8s) haritayı odakla ve popup aç
+            setTimeout(() => {
+                map.setView([item.lat, item.lng], 10, { animate: true, duration: 1 });
+                if (markersLayer[item.id]) {
+                    markersLayer[item.id].openPopup();
+                }
+                // Çizgiyi yavaşça temizle
+                setTimeout(() => {
+                    svg.innerHTML = '';
+                }, 400);
+            }, 800);
         }
 
         function renderApp() {
@@ -652,9 +713,9 @@
 
                 markersLayer[item.id] = marker;
 
+                // Kart tıklanınca el çizimi ok animasyonu tetiklenir
                 card.addEventListener('click', function() {
-                    map.setView([item.lat, item.lng], 10, { animate: true, duration: 1 });
-                    marker.openPopup();
+                    triggerCardAnimation(item, card);
                 });
 
                 workListContainer.appendChild(card);
