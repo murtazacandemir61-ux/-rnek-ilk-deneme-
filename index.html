@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Türk Edebiyatı Mekân ve Rota Atlası</title>
+    <!-- Google Fonts (Roboto ve Playfair Display) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <!-- Leaflet Harita Kütüphanesi CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -16,10 +18,13 @@
             --text-primary: #f4f4f5;
             --text-secondary: #a1a1aa;
             --border-glass: rgba(255, 255, 255, 0.08);
+            --app-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --app-weight: 400;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: var(--app-font); 
+            font-weight: var(--app-weight);
             background-color: var(--bg-color); 
             color: var(--text-primary); 
             display: flex; 
@@ -30,8 +35,13 @@
             -webkit-font-smoothing: antialiased;
         }
         
-        /* Netlify Rozetini ve Yazısını Tamamen Gizleyen Kod */
-        a[href*="netlify.com"], div[style*="netlify"], .netlify-badge { display: none !important; }
+        /* Netlify Rozetini Kökünden Gizleyen Kodlar */
+        iframe[src*="netlify"], #netlify-badge, .netlify-badge, a[href*="netlify.com"] { 
+            display: none !important; 
+            visibility: hidden !important; 
+            opacity: 0 !important; 
+            pointer-events: none !important; 
+        }
 
         /* Sol Panel */
         #sidebar { 
@@ -76,16 +86,16 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.4);
             border-color: rgba(245, 158, 11, 0.3);
         }
-        .work-card h3 { font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; font-weight: 400; }
-        .work-card .location { font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; font-weight: 500; border: 1px solid var(--border-glass); }
+        .work-card h3 { font-size: 1.05rem; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; }
+        .work-card .location { font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border-glass); }
         .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin: 6px 0 10px 0; display: block; border: 1px solid var(--border-glass); }
         .work-card p { font-size: 0.85rem; color: #d4d4d8; line-height: 1.5; border-top: 1px solid var(--border-glass); padding-top: 10px; }
 
         /* Harita Alanı */
         #map { flex-grow: 1; height: 100%; width: 100%; background-color: #0b0b0d; position: relative; }
         
-        /* Özel Apple Popup ve Kapatma Butonu Tasarımı */
+        /* Popup ve Kapatma Butonu Tasarımı */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
             background: rgba(28, 28, 30, 0.95) !important;
             backdrop-filter: blur(25px) !important;
@@ -159,6 +169,32 @@
         .dropdown-menu::-webkit-scrollbar { width: 5px; }
         .dropdown-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .dropdown-menu.show { display: block; animation: fadeIn 0.2s ease; }
+
+        /* İki Sütunlu Geniş Yazı Stili Paneli */
+        #font-style-menu {
+            width: 320px;
+            display: none;
+            padding: 12px;
+            gap: 12px;
+        }
+        #font-style-menu.show {
+            display: flex !important;
+        }
+        .menu-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .menu-column-title {
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+            padding-left: 4px;
+        }
         
         .dropdown-option { 
             padding: 9px 12px; 
@@ -174,6 +210,7 @@
             font-weight: 500;
         }
         .dropdown-option:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-color); }
+        .dropdown-option.active { background-color: rgba(245, 158, 11, 0.3); color: var(--accent-color); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-6px); }
@@ -192,6 +229,27 @@
 
     <!-- Sağ Üst Kontroller -->
     <div class="top-controls">
+        <!-- Yazı Stili Butonu (İki Sütunlu) -->
+        <div style="position: relative;" id="font-container">
+            <button class="pill-btn" onclick="toggleFontMenu()" id="font-style-btn">🔤 Yazı Stili</button>
+            <div id="font-style-menu" class="dropdown-menu">
+                <div class="menu-column">
+                    <div class="menu-column-title" id="lbl-font">Yazı Tipi</div>
+                    <button class="dropdown-option font-opt active" onclick="setFontFamily('-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif', this)">Varsayılan</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('Rosemary, cursive, sans-serif', this)">Rosemary</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('Cool Jazz, cursive, sans-serif', this)">Cool Jazz</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily(\'Roboto\', sans-serif', this)">Roboto</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily(\'Playfair Display\', serif', this)">Playfair</button>
+                </div>
+                <div class="menu-column">
+                    <div class="menu-column-title" id="lbl-weight">Kalınlık</div>
+                    <button class="dropdown-option weight-opt active" onclick="setFontWeight('400', this)">Normal</button>
+                    <button class="dropdown-option weight-opt" onclick="setFontWeight('700', this)">Kalın</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Harita Modu Butonu -->
         <div style="position: relative;">
             <button class="pill-btn" onclick="toggleMapMenu()" id="map-mode-btn">🗺️ Harita Modu</button>
             <div id="map-menu" class="dropdown-menu">
@@ -201,6 +259,7 @@
             </div>
         </div>
 
+        <!-- Dil Seçici Butonu -->
         <div style="position: relative;" id="lang-container">
             <button class="pill-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
             <div id="lang-menu" class="dropdown-menu">
@@ -231,16 +290,16 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         const uiTexts = {
-            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu" },
-            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style" },
-            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte" },
-            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة" },
-            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه" },
-            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式" },
-            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil" },
-            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη" },
-            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル" },
-            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली" }
+            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu", fontStyle: "🔤 Yazı Stili", fontTitle: "Yazı Tipi", weightTitle: "Kalınlık", normal: "Normal", bold: "Kalın" },
+            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style", fontStyle: "🔤 Font Style", fontTitle: "Font Family", weightTitle: "Weight", normal: "Normal", bold: "Bold" },
+            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte", fontStyle: "🔤 Style de Police", fontTitle: "Police", weightTitle: "Épaisseur", normal: "Normal", bold: "Gras" },
+            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة", fontStyle: "🔤 نمط الخط", fontTitle: "نوع الخط", weightTitle: "السمك", normal: "عادي", bold: "عريض" },
+            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه", fontStyle: "🔤 سبک قلم", fontTitle: "نوع قلم", weightTitle: "ضخامت", normal: "معمولی", bold: "ضخیم" },
+            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式", fontStyle: "🔤 字体样式", fontTitle: "字体", weightTitle: "字重", normal: "常规", bold: "加粗" },
+            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil", fontStyle: "🔤 Schriftstil", fontTitle: "Schriftart", weightTitle: "Stärke", normal: "Normal", bold: "Fett" },
+            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη", fontStyle: "🔤 Στυλ Γραμματοσειράς", fontTitle: "Γραμματοσειρά", weightTitle: "Πάχος", normal: "Κανονικό", bold: "Έντονο" },
+            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル", fontStyle: "🔤 フォントスタイル", fontTitle: "フォント", weightTitle: "太さ", normal: "標準", bold: "太字" },
+            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली", fontStyle: "🔤 फ़ॉन्ट शैली", fontTitle: "फ़ॉन्ट", weightTitle: "मोटाई", normal: "सामान्य", bold: "बोल्ड" }
         };
 
         const literaryData = [
@@ -260,7 +319,7 @@
                     de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
                     el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
                     ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी।"
+                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी."
                 },
                 image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
             },
@@ -300,7 +359,7 @@
                     de: "In jenen alten, friedlichen Ramadan-Abenden von Şehzadebaşı trugen die Uhrengeräusche den Menschen aus der Zeit.",
                     el: "Σε εκείνα τα παλιά, ειρηνικά βράδια του Ραμαζανιού στο Şehzadebaşı, οι ήχοι των ρολογιών μετέφεραν τον άνθρωπο έξω από τον χρόνο.",
                     ja: "シェフザーデバシュの古く平和なラマダンの夕べには、時計の音が人を時間の外へと運んでいきました。",
-                    hi: "शेहजादेबासी की उन पुरानी, शांत रमजान की शामों में घड़ियों की आवाजें इंसान को समय से बाहर ले जाती थीं।"
+                    hi: "शेहजादेबासी की उन पुरानी, शांत रमजान की शामों में घड़ियों की आवाजें इंसान को समय से बाहर ले जाती थीं."
                 },
                 image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800"
             },
@@ -367,17 +426,30 @@
         let currentLayer = layers.standard.addTo(map);
         let markersLayer = {};
 
-        function toggleLangMenu() {
-            document.getElementById('lang-menu').classList.toggle('show');
+        // Menü Kontrolleri
+        function toggleFontMenu() {
+            const menu = document.getElementById('font-style-menu');
+            menu.classList.toggle('show');
             document.getElementById('map-menu').classList.remove('show');
+            document.getElementById('lang-menu').classList.remove('show');
         }
 
         function toggleMapMenu() {
             document.getElementById('map-menu').classList.toggle('show');
+            document.getElementById('font-style-menu').classList.remove('show');
             document.getElementById('lang-menu').classList.remove('show');
         }
 
+        function toggleLangMenu() {
+            document.getElementById('lang-menu').classList.toggle('show');
+            document.getElementById('font-style-menu').classList.remove('show');
+            document.getElementById('map-menu').classList.remove('show');
+        }
+
         window.addEventListener('click', function(e) {
+            if (!document.getElementById('font-container').contains(e.target)) {
+                document.getElementById('font-style-menu').classList.remove('show');
+            }
             if (!document.getElementById('lang-container').contains(e.target)) {
                 document.getElementById('lang-menu').classList.remove('show');
             }
@@ -398,8 +470,24 @@
             document.getElementById('map-menu').classList.remove('show');
         }
 
+        function setFontFamily(fontFamily, btnElement) {
+            document.documentElement.style.setProperty('--app-font', fontFamily);
+            document.querySelectorAll('.font-opt').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        function setFontWeight(weightValue, btnElement) {
+            document.documentElement.style.setProperty('--app-weight', weightValue);
+            document.querySelectorAll('.weight-opt').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
         function renderApp() {
             document.getElementById('ui-title').innerText = uiTexts[currentLang].title;
+            document.getElementById('font-style-btn').innerText = uiTexts[currentLang].fontStyle;
+            document.getElementById('map-mode-btn').innerText = uiTexts[currentLang].mapMode;
+            document.getElementById('lbl-font').innerText = uiTexts[currentLang].fontTitle;
+            document.getElementById('lbl-weight').innerText = uiTexts[currentLang].weightTitle;
 
             const workListContainer = document.getElementById('workList');
             workListContainer.innerHTML = '';
@@ -413,7 +501,7 @@
                 const card = document.createElement('div');
                 card.className = 'work-card';
                 card.innerHTML = '<h3>' + item.title[currentLang] + '</h3>' +
-                                 '<div class="author">' + item.author[currentLang] + '</div>' +!
+                                 '<div class="author">' + item.author[currentLang] + '</div>' +
                                  '<div class="location">📍 ' + item.locationName[currentLang] + '</div>' +
                                  '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
                                  '<p>"' + item.quote[currentLang] + '"</p>';
