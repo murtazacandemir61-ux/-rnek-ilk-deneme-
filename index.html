@@ -30,6 +30,9 @@
             -webkit-font-smoothing: antialiased;
         }
         
+        /* Netlify Rozetini ve Yazısını Tamamen Gizleyen Kod */
+        a[href*="netlify.com"], div[style*="netlify"], .netlify-badge { display: none !important; }
+
         /* Sol Panel */
         #sidebar { 
             width: 400px; 
@@ -111,7 +114,7 @@
             background: rgba(245, 158, 11, 0.8) !important;
         }
 
-        /* Sağ Üst Kontroller (Dil ve Harita Modülü) */
+        /* Sağ Üst Kontroller */
         .top-controls { position: absolute; top: 20px; right: 24px; z-index: 2000; display: flex; gap: 12px; }
         
         .pill-btn { 
@@ -187,9 +190,8 @@
 </head>
 <body>
 
-    <!-- Sağ Üst Kontroller (Harita Modu ve Dil Seçici) -->
+    <!-- Sağ Üst Kontroller -->
     <div class="top-controls">
-        <!-- Harita Modülü Butonu -->
         <div style="position: relative;">
             <button class="pill-btn" onclick="toggleMapMenu()" id="map-mode-btn">🗺️ Harita Modu</button>
             <div id="map-menu" class="dropdown-menu">
@@ -199,7 +201,6 @@
             </div>
         </div>
 
-        <!-- Dil Seçici Butonu -->
         <div style="position: relative;" id="lang-container">
             <button class="pill-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
             <div id="lang-menu" class="dropdown-menu">
@@ -347,7 +348,6 @@
 
         let currentLang = 'tr';
 
-        // Harita Sınırları ve Optimizasyonu (minZoom: 6 ile Türkiye'den fazla uzaklaşılamaz)
         const map = L.map('map', { 
             zoomControl: false,
             minZoom: 6,
@@ -358,7 +358,6 @@
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Katman Tanımları
         const layers = {
             standard: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, keepBuffer: 8, attribution: '&copy; OpenStreetMap' }),
             topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, keepBuffer: 8, attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap' }),
@@ -368,7 +367,6 @@
         let currentLayer = layers.standard.addTo(map);
         let markersLayer = {};
 
-        // Menü Kontrolleri
         function toggleLangMenu() {
             document.getElementById('lang-menu').classList.toggle('show');
             document.getElementById('map-menu').classList.remove('show');
@@ -415,7 +413,7 @@
                 const card = document.createElement('div');
                 card.className = 'work-card';
                 card.innerHTML = '<h3>' + item.title[currentLang] + '</h3>' +
-                                 '<div class="author">' + item.author[currentLang] + '</div>' +
+                                 '<div class="author">' + item.author[currentLang] + '</div>' +!
                                  '<div class="location">📍 ' + item.locationName[currentLang] + '</div>' +
                                  '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
                                  '<p>"' + item.quote[currentLang] + '"</p>';
