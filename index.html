@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Türk Edebiyatı Mekân ve Rota Atlası</title>
+    <title>Klasik Türk Edebiyatı Coğrafi Rota ve Eser Atlası</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Leaflet Harita Kütüphanesi CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --bg-color: #0b0b0d;
-            --panel-bg: rgba(28, 28, 30, 0.75);
+            --panel-bg: rgba(28, 28, 30, 0.85);
             --card-bg: rgba(44, 44, 46, 0.6);
-            --card-hover: rgba(58, 58, 60, 0.8);
+            --card-hover: rgba(58, 58, 60, 0.85);
             --accent-color: #f59e0b; /* Apple Altın/Kehribar */
             --text-primary: #f4f4f5;
             --text-secondary: #a1a1aa;
-            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glass: rgba(255, 255, 255, 0.1);
             --app-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --app-weight: 400;
         }
@@ -32,10 +32,8 @@
             width: 100vw;
             overflow: hidden; 
             position: relative; 
-            -webkit-font-smoothing: antialiased;
         }
         
-        /* Netlify / Dış Etken Rozetleri Gizleme */
         iframe[src*="netlify"], #netlify-badge, .netlify-badge, a[href*="netlify.com"] { 
             display: none !important; 
             visibility: hidden !important; 
@@ -45,8 +43,8 @@
 
         /* Sol Panel */
         #sidebar { 
-            width: 400px; 
-            min-width: 400px;
+            width: 420px; 
+            min-width: 420px;
             background: var(--panel-bg); 
             backdrop-filter: blur(30px); 
             -webkit-backdrop-filter: blur(30px);
@@ -54,48 +52,47 @@
             display: flex; 
             flex-direction: column; 
             z-index: 1000; 
-            box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+            box-shadow: 20px 0 50px rgba(0,0,0,0.6);
         }
         .sidebar-header { 
-            padding: 20px 24px; 
+            padding: 22px 24px; 
             border-bottom: 1px solid var(--border-glass); 
-            background: rgba(28, 28, 30, 0.4); 
+            background: rgba(28, 28, 30, 0.5); 
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            position: relative;
         }
-        .sidebar-header h1 { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; white-space: nowrap; }
+        .sidebar-header h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
         
         /* Arama Kutusu */
         .search-container {
             position: relative;
             flex: 1;
-            max-width: 180px;
+            max-width: 170px;
         }
         .search-input {
             width: 100%;
-            background: rgba(20, 20, 22, 0.8);
+            background: rgba(20, 20, 22, 0.9);
             border: 1px solid var(--border-glass);
             border-radius: 20px;
-            padding: 7px 12px 7px 32px;
+            padding: 7px 12px 7px 30px;
             color: var(--text-primary);
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             outline: none;
             transition: all 0.2s;
         }
         .search-input:focus {
             border-color: var(--accent-color);
-            background: rgba(30, 30, 35, 0.9);
-            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+            background: rgba(30, 30, 35, 0.95);
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
         }
         .search-icon {
             position: absolute;
             left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             pointer-events: none;
             color: var(--text-secondary);
         }
@@ -105,25 +102,25 @@
             top: 38px;
             left: 0;
             width: 100%;
-            background: rgba(28, 28, 30, 0.95);
+            background: rgba(28, 28, 30, 0.98);
             backdrop-filter: blur(20px);
             border: 1px solid var(--border-glass);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
             z-index: 3000;
         }
         .search-suggestions.show { display: block; }
         .suggestion-item {
             padding: 9px 12px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             color: var(--text-primary);
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.04);
             transition: background 0.15s;
         }
         .suggestion-item:hover {
-            background: rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.25);
             color: var(--accent-color);
         }
 
@@ -135,40 +132,53 @@
         .work-card { 
             background: var(--card-bg); 
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border-glass);
             border-radius: 16px; 
             padding: 16px; 
             margin-bottom: 14px; 
             cursor: pointer; 
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
         }
         .work-card:hover, .work-card.highlight { 
             background: var(--card-hover); 
             transform: translateY(-3px); 
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+            border-color: rgba(245, 158, 11, 0.6);
         }
-        .work-card h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; }
+        .work-card h3 { font-size: 1.05rem; color: #fff; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
         .work-card .author { font-size: 0.85rem; color: var(--accent-color); font-style: italic; margin-bottom: 8px; }
-        .work-card .location { font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.3); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border-glass); }
+        .work-card .location { font-size: 0.75rem; color: var(--text-secondary); background: rgba(0,0,0,0.4); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid var(--border-glass); }
         .work-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin: 6px 0 10px 0; display: block; border: 1px solid var(--border-glass); }
-        .work-card p { font-size: 0.85rem; color: #d4d4d8; line-height: 1.5; border-top: 1px solid var(--border-glass); padding-top: 10px; }
+        .work-card p { font-size: 0.83rem; color: #d4d4d8; line-height: 1.5; border-top: 1px solid var(--border-glass); padding-top: 10px; }
+        
+        .active-badge {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-color);
+            font-size: 0.72rem;
+            padding: 3px 8px;
+            border-radius: 6px;
+            float: right;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            font-weight: 500;
+        }
 
         /* Harita Alanı */
         #map { flex-grow: 1; height: 100%; width: 100%; background-color: #0b0b0d; position: relative; }
 
-        /* Popup ve Kapatma Butonu Tasarımı */
+        /* Popup Tasarımı */
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-            background: rgba(28, 28, 30, 0.95) !important;
+            background: rgba(28, 28, 30, 0.96) !important;
             backdrop-filter: blur(25px) !important;
             color: #fff !important;
             border-radius: 16px !important;
             border: 1px solid var(--border-glass);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6) !important;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7) !important;
         }
-        .leaflet-popup-content img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: block; }
+        .leaflet-popup-content { width: 260px !important; line-height: 1.5; }
+        .leaflet-popup-content img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin: 8px 0; display: block; border: 1px solid var(--border-glass); }
+        .leaflet-popup-content h4 { color: var(--accent-color); font-size: 0.95rem; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
+        .leaflet-popup-content p { font-size: 0.8rem; color: #d4d4d8; font-style: italic; margin-top: 6px; }
         .leaflet-container a.leaflet-popup-close-button {
             background: rgba(255, 255, 255, 0.15) !important;
             color: #fff !important;
@@ -181,84 +191,47 @@
             top: 12px !important;
             right: 12px !important;
             font-size: 14px !important;
-            font-weight: bold;
-            transition: background 0.2s;
         }
-        .leaflet-container a.leaflet-popup-close-button:hover {
-            background: rgba(245, 158, 11, 0.8) !important;
-        }
+        .leaflet-container a.leaflet-popup-close-button:hover { background: rgba(245, 158, 11, 0.8) !important; }
 
         /* Sağ Üst Kontroller */
         .top-controls { position: absolute; top: 20px; right: 24px; z-index: 2000; display: flex; gap: 12px; }
         
         .pill-btn { 
-            background: rgba(28, 28, 30, 0.85); 
+            background: rgba(28, 28, 30, 0.88); 
             backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
             color: var(--text-primary); 
             border: 1px solid var(--border-glass); 
             padding: 8px 18px; 
             height: 42px; 
             border-radius: 21px; 
             cursor: pointer; 
-            font-size: 0.9rem; 
+            font-size: 0.88rem; 
             font-weight: 500;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 8px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
-            transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
+            transition: all 0.2s; 
         }
-        .pill-btn:hover { transform: scale(1.05); background: rgba(58, 58, 60, 0.9); border-color: var(--accent-color); }
+        .pill-btn:hover { transform: scale(1.04); background: rgba(58, 58, 60, 0.95); border-color: var(--accent-color); }
         
         .dropdown-menu { 
             display: none; 
             position: absolute; 
             right: 0; 
             top: 52px; 
-            background: rgba(28, 28, 30, 0.95); 
+            background: rgba(28, 28, 30, 0.96); 
             backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border-glass); 
             border-radius: 14px; 
-            overflow-y: auto; 
-            max-height: 320px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
             width: 170px; 
             padding: 6px;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.2) transparent;
+            z-index: 2500;
         }
-        .dropdown-menu::-webkit-scrollbar { width: 5px; }
-        .dropdown-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         .dropdown-menu.show { display: block; animation: fadeIn 0.2s ease; }
-
-        /* İki Sütunlu Geniş Yazı Stili Paneli */
-        #font-style-menu {
-            width: 340px;
-            display: none;
-            padding: 12px;
-            gap: 12px;
-        }
-        #font-style-menu.show {
-            display: flex !important;
-        }
-        .menu-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .menu-column-title {
-            font-size: 0.75rem;
-            color: var(--accent-color);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            letter-spacing: 0.05em;
-            padding-left: 4px;
-        }
         
         .dropdown-option { 
             padding: 9px 12px; 
@@ -268,23 +241,21 @@
             width: 100%; 
             text-align: left; 
             cursor: pointer; 
-            font-size: 0.85rem; 
+            font-size: 0.84rem; 
             border-radius: 8px;
             transition: background 0.15s;
             font-weight: 500;
         }
         .dropdown-option:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-color); }
-        .dropdown-option.active { background-color: rgba(245, 158, 11, 0.3); color: var(--accent-color); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Mobil Uyum */
         @media (max-width: 768px) {
             body { flex-direction: column; }
-            #sidebar { width: 100%; min-width: 100%; height: 45vh; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+            #sidebar { width: 100%; min-width: 100%; height: 45vh; }
             #map { height: 55vh; }
         }
     </style>
@@ -293,25 +264,6 @@
 
     <!-- Sağ Üst Kontroller -->
     <div class="top-controls">
-        <!-- Yazı Stili Butonu -->
-        <div style="position: relative;" id="font-container">
-            <button class="pill-btn" onclick="toggleFontMenu()" id="font-style-btn">🔤 Yazı Stili</button>
-            <div id="font-style-menu" class="dropdown-menu">
-                <div class="menu-column">
-                    <div class="menu-column-title" id="lbl-font">Yazı Tipi</div>
-                    <button class="dropdown-option font-opt active" onclick="setFontFamily('default', this)">Varsayılan</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('rosemary', this)">Rosemary</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('roboto', this)">Roboto</button>
-                    <button class="dropdown-option font-opt" onclick="setFontFamily('playfair', this)">Playfair</button>
-                </div>
-                <div class="menu-column">
-                    <div class="menu-column-title" id="lbl-weight">Kalınlık</div>
-                    <button class="dropdown-option weight-opt active" onclick="setFontWeight('400', this)">Normal</button>
-                    <button class="dropdown-option weight-opt" onclick="setFontWeight('700', this)">Kalın</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Harita Modu Butonu -->
         <div style="position: relative;">
             <button class="pill-btn" onclick="toggleMapMenu()" id="map-mode-btn">🗺️ Harita Modu</button>
@@ -322,28 +274,13 @@
             </div>
         </div>
 
-        <!-- Dil Seçici Butonu -->
-        <div style="position: relative;" id="lang-container">
-            <button class="pill-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
-            <div id="lang-menu" class="dropdown-menu">
-                <button class="dropdown-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
-                <button class="dropdown-option" onclick="setLanguage('en')">🇬🇧 English</button>
-                <button class="dropdown-option" onclick="setLanguage('fr')">🇫🇷 Français</button>
-                <button class="dropdown-option" onclick="setLanguage('ar')">🇸🇦 العربية</button>
-                <button class="dropdown-option" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
-                <button class="dropdown-option" onclick="setLanguage('zh')">🇨🇳 中文</button>
-                <button class="dropdown-option" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
-                <button class="dropdown-option" onclick="setLanguage('el')">🇬🇷 Ελληνικά</button>
-                <button class="dropdown-option" onclick="setLanguage('ja')">🇯🇵 日本語</button>
-                <button class="dropdown-option" onclick="setLanguage('hi')">🇮🇳 हिन्दी</button>
-            </div>
-        </div>
+        <!-- Sıfırlama / Ana Görünüm Butonu -->
+        <button class="pill-btn" onclick="resetMapToInitial()" title="İlk Konumlara Dön">🔄 Rota Sıfırla</button>
     </div>
 
     <div id="sidebar">
         <div class="sidebar-header">
-            <h1 id="ui-title">Türk Edebiyatı Atlası</h1>
-            <!-- Sol Bölme Sağ Üst Arama Kutusu -->
+            <h1 id="ui-title">Klasik Edebiyat Rotaları</h1>
             <div class="search-container">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="workSearchInput" class="search-input" placeholder="Eser ara..." oninput="handleSearchInput(this.value)">
@@ -356,177 +293,85 @@
     <!-- Harita Alanı -->
     <div id="map"></div>
 
-    <!-- Leaflet Harita Kütüphanesi JS -->
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const uiTexts = {
-            tr: { title: "Türk Edebiyatı Atlası", loc: "Mekân:", mapMode: "🗺️ Harita Modu", fontStyle: "🔤 Yazı Stili", fontTitle: "Yazı Tipi", weightTitle: "Kalınlık", normal: "Normal", bold: "Kalın", searchPlaceholder: "Eser ara..." },
-            en: { title: "Turkish Literature Atlas", loc: "Location:", mapMode: "🗺️ Map Style", fontStyle: "🔤 Font Style", fontTitle: "Font Family", weightTitle: "Weight", normal: "Normal", bold: "Bold", searchPlaceholder: "Search work..." },
-            fr: { title: "Atlas de Littérature Turque", loc: "Lieu:", mapMode: "🗺️ Style de Carte", fontStyle: "🔤 Style de Police", fontTitle: "Police", weightTitle: "Épaisseur", normal: "Normal", bold: "Gras", searchPlaceholder: "Rechercher..." },
-            ar: { title: "أطلس الأدب التركي", loc: "الموقع:", mapMode: "🗺️ نمط الخريطة", fontStyle: "🔤 نمط الخط", fontTitle: "نوع الخط", weightTitle: "السمك", normal: "عادي", bold: "عريض", searchPlaceholder: "بحث عن عمل..." },
-            fa: { title: "اتلس ادبیات ترکی", loc: "مکان:", mapMode: "🗺️ حالت نقشه", fontStyle: "🔤 سبک قلم", fontTitle: "نوع قلم", weightTitle: "ضخامت", normal: "معمولی", bold: "ضخیم", searchPlaceholder: "جستجوی اثر..." },
-            zh: { title: "土耳其文学地图集", loc: "地点：", mapMode: "🗺️ 地图样式", fontStyle: "🔤 字体样式", fontTitle: "字体", weightTitle: "字重", normal: "常规", bold: "加粗", searchPlaceholder: "搜索作品..." },
-            de: { title: "Türkischer Literaturatlas", loc: "Ort:", mapMode: "🗺️ Kartenstil", fontStyle: "🔤 Schriftstil", fontTitle: "Schriftart", weightTitle: "Stärke", normal: "Normal", bold: "Fett", searchPlaceholder: "Werk suchen..." },
-            el: { title: "Άτλας Τουρκικής Λογοτεχνίας", loc: "Τοποθεσία:", mapMode: "🗺️ Στυλ Χάρτη", fontStyle: "🔤 Στυλ Γραμματοσειράς", fontTitle: "Γραμματοσειρά", weightTitle: "Πάχος", normal: "Κανονικό", bold: "Έντονο", searchPlaceholder: "Αναζήτηση..." },
-            ja: { title: "トルコ文学アトラス", loc: "場所：", mapMode: "🗺️ マップスタイル", fontStyle: "🔤 フォントスタイル", fontTitle: "フォント", weightTitle: "太さ", normal: "標準", bold: "太字", searchPlaceholder: "作品を検索..." },
-            hi: { title: "तुर्की साहित्य एटलस", loc: "स्थान:", mapMode: "🗺️ मानचित्र शैली", fontStyle: "🔤 फ़ॉन्ट शैली", fontTitle: "फ़ॉन्ट", weightTitle: "मोटाई", normal: "सामान्य", bold: "बोल्ड", searchPlaceholder: "कृति खोजें..." }
-        };
-
-        const literaryData = [
+        // Klasik Türk Edebiyatı Değerli Eserleri ve Kronolojik Rota Durakları
+        const classicalWorks = [
             {
                 id: 1,
-                title: { tr: "Çalıkuşu", en: "The Wren", fr: "L'Oiselle", ar: "طائر الدبس", fa: "چکاوک", zh: "鹪鹩", de: "Der Buchfink", el: "Τσαλουκούσου", ja: "チャルクシュ", hi: "चलिकुशु" },
-                author: { tr: "Reşat Nuri Güntekin", en: "Reşat Nuri Güntekin", fr: "Reşat Nuri Güntekin", ar: "رشاد نوري غونتكين", fa: "رشاد نوری گون تکین", zh: "雷沙特·努里·金特金", de: "Reşat Nuri Güntekin", el: "Ρεσάτ Νουρί Γκουντεκίν", ja: "レシャト・ヌリ・ギュンテキン", hi: "रेशाट नूरी गुन्तेकिन" },
-                locationName: { tr: "Zeyniler Köyü (Bursa)", en: "Zeyniler Village (Bursa)", fr: "Village de Zeyniler (Bursa)", ar: "قرية زينيلير (بورصة)", fa: "روستای زینیلر (بورسا)", zh: "泽伊尼勒村 (布尔萨)", de: "Dorf Zeyniler (Bursa)", el: "Χωριό Ζεινιλέρ (Προύσα)", ja: "ゼイニレル村 (ブルサ)", hi: "ज़ेयनिलेर गाँव (बुर्सा)" },
-                lat: 40.1885, lng: 29.0610, emoji: "🌳",
-                quote: {
-                    tr: "Zeyniler köyü, dağ başından aşağıya doğru inen virajlı bir yokuşun bitiminde, etrafı ceviz ağaçlarıyla çevrili sessiz bir yerdi.",
-                    en: "Zeyniler village was a quiet place surrounded by walnut trees at the end of a winding slope coming down from the mountain.",
-                    fr: "Le village de Zeyniler était un endroit calme entouré de noyers au bout d'une pente sinueuse descendant de la montagne.",
-                    ar: "كانت قرية زينيلير مكاناً هادئاً تحيط به شجر الجوز في نهاية منحدر متعرج ينزل من الجبل.",
-                    fa: "روستای زینیلر جایی آرام بود که در انتهای یک سراشیبی پرپیچ و خم از کوه، با درختان گردو احاطه شده بود.",
-                    zh: "泽伊尼勒村是一个安静的地方，四周环绕着核桃树，位于山间蜿蜒下坡的尽头。",
-                    de: "Das Dorf Zeyniler war ein ruhiger Ort, umgeben von Walnüssen am Ende eines windungsreichen Abhangs.",
-                    el: "Το χωριό Ζεινιλέρ ήταν ένα ήσυχο μέρος περιτριγυρισμένο από καρυδιές στο τέλος μιας ανצيفorικής πλαγιάς.",
-                    ja: "ゼイニレル村は、山からの曲がりくねった坂道の終わりにクルミの木に囲まれた静かな場所でした。",
-                    hi: "ज़ेयनिलेर गाँव एक शांत जगह थी जो पहाड़ से नीचे उतरने वाले एक घुमावदार ढलान के अंत में अखरोट के पेड़ों से घिरी हुई थी."
-                },
-                image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800"
+                title: "İskendurname",
+                author: "Ahmedî",
+                initialLocation: "Amasya (Yazıldığı Merkez)",
+                lat: 40.6549, lng: 35.8356,
+                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800",
+                description: "Ahmedî'nin kaleme aldığı, İskender'in Doğu'dan Batı'ya seferlerini ve felsefi duraklarını anlatan şaheser.",
+                journey: [
+                    { step: 1, title: "Mekke & Kabe", lat: 21.3891, lng: 39.8579, quote: "Mekke'den çıkıp Kabe'yi ziyaretden sonra batı diyarlarına doğru bir orduyla yola revan oldu.", image: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=800" },
+                    { step: 2, title: "Mısır & İskenderiye", lat: 31.2001, lng: 29.9187, quote: "Mısır diyarını fetheyleyip Nil nehrinin kıyısında büyük bir şehir bünyat eyledi.", image: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800" },
+                    { step: 3, title: "İran / Pers Diyarı", lat: 32.4279, lng: 53.6880, quote: "Acem vilayetine varıp Dara tahtını ele geçirdi ve doğu illerine adalet dağıttı.", image: "https://images.unsplash.com/photo-1584646098378-0874589d76b1?w=800" },
+                    { step: 4, title: "Hindistan Diyarı", lat: 28.6139, lng: 77.2090, quote: "Hindistan'ın karanlık ülkesine ve dağlarına ulaşıp garip acayibler müşahede kıldı.", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800" },
+                    { step: 5, title: "Çin ve Maçin", lat: 39.9042, lng: 116.4074, quote: "Çin ve Maçin hududuna varıp burç ve kaleleri fethetti, Doğu'nun sultanı oldu.", image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800" }
+                ]
             },
             {
                 id: 2,
-                title: { tr: "Yaban", en: "The Stranger", fr: "L'Étranger", ar: "الأجنبي (ياباني)", fa: "بیگانه (یابان)", zh: "异乡人", de: "Der Fremde", el: "Ο Ξένος", ja: "異邦人", hi: "अजनबी" },
-                author: { tr: "Yakup Kadri Karaosmanoğlu", en: "Yakup Kadri Karaosmanoğlu", fr: "Yakup Kadri Karaosmanoğlu", ar: "يعقوب قادري قره عثمان أوغلو", fa: "یعقوب قدری کاراوسمان‌اوغلو", zh: "雅库普·卡德里·卡拉奥斯马诺格卢", de: "Yakup Kadri Karaosmanoğlu", el: "Γιακούπ Καντρί Καραοσμανογλού", ja: "ヤクプ・カドリ・カラオスマノール", hi: "याकुप कादरी काराओस्मानोग्लू" },
-                locationName: { tr: "Porsuk Çayı Kenarı (Eskişehir)", en: "Porsuk Stream Bank (Eskişehir)", fr: "Rive de la rivière Porsuk (Eskişehir)", ar: "ضفة نهر بورسوك (إسكي شهر)", fa: "کناره رودخانه پورصوک (اسکی‌شهر)", zh: "波尔苏克河畔 (埃斯基谢希尔)", de: "Porsuk-Ufer (Eskişehir)", el: "Όχθη ποταμού Πορσούκ (Εσκιζεχίρ)", ja: "ポルスク川岸 (エスキシェヒル)", hi: "पोरसुक धारा तट (एस्किसेहिर)" },
-                lat: 39.4447, lng: 31.5369, emoji: "💧",
-                quote: {
-                    tr: "Bu köylüler, aydın kişinin uzattığı eli ısıracak kadar yaban ve yalnız bırakılmışlardı.",
-                    en: "These villagers had been left so wild and alone that they would bite the hand extended by the intellectual.",
-                    fr: "Ces villageois avaient été laissés si sauvages et seuls qu'ils mordaient la main tendue.",
-                    ar: "ترك هؤلاء القرويون متوحشين ووحيدين لدرجة أنهم يعضون يد المثقف الممتدة.",
-                    fa: "این روستاییان چنان وحشی و تنها رها شده بودند که دست دراز شده روشنفکر را گاز می‌گرفتند.",
-                    zh: "这些村民被遗弃得如此野蛮和孤独，以至于他们会咬知识分子伸出的手。",
-                    de: "Diese Dorfbewohner waren so wild und einsam gelassen worden, dass sie die Hand des Intellektuellen bissen.",
-                    el: "Αυτοί οι χωρικοί είχαν αεθεί τόσο άγριοι και μόνοι που δαγκωναν το χέρι.",
-                    ja: "これらの村人たちは非常に野生で孤独に放置されており、知識人の差し出した手を噛むほどでした。",
-                    hi: "इन ग्रामवासियों को इतना जंगली और अकेला छोड़ दिया गया था कि वे बुद्धिजीवी द्वारा बढ़ाए गए हाथ को काट लेते."
-                },
-                image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800"
+                title: "Seyahatname",
+                author: "Evliya Çelebi",
+                initialLocation: "İstanbul (Yola Çıkış Noktası)",
+                lat: 41.0082, lng: 28.9784,
+                image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800",
+                description: "Evliya Çelebi'nin rüya ile başlayan ve Osmanlı coğrafyasını karış karış gezen muazzam seyahat külliyatı.",
+                journey: [
+                    { step: 1, title: "Bursa (İlk Seyahat)", lat: 40.1885, lng: 29.0610, quote: "İlk seyahatimiz İshak Dede rüyasıyla Bursa'ya oldu; kaplıcaları ve ulu camii ile göz kamaştırır.", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800" },
+                    { step: 2, title: "İzmit (Nicomedia)", lat: 40.7654, lng: 29.9408, quote: "İzmit Kalesi'nin sarp kayalıkları üzerinde koca bir liman ve gemiciler diyarı vardır.", image: "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=800" },
+                    { step: 3, title: "Trabzon", lat: 41.0015, lng: 39.7178, quote: "Trabzon kıyılarında Karadeniz'in hırçın dalgaları Lazistan dağlarına dövünür durur.", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800" },
+                    { step: 4, title: "Bağdat", lat: 33.3152, lng: 44.3661, quote: "Bağdat diyarına varıp Dicle nehrinin kenarında Abbasi halifelerinin izlerini aradık.", image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800" },
+                    { step: 5, title: "Kahire (Mısır)", lat: 30.0444, lng: 31.2357, quote: "Mısır diyarında Mısr-ı âmir şehrine girip Piramitlerin heybetinden parmak ısırdık.", image: "https://images.unsplash.com/photo-1568322445389-f64ac25256e6?w=800" }
+                ]
             },
             {
                 id: 3,
-                title: { tr: "Saatleri Ayarlama Enstitüsü", en: "The Time Regulation Institute", fr: "L'Institut de Régulation des Heures", ar: "معهد ضبط الساعات", fa: "مؤسسه تنظیم ساعت", zh: "时钟调节研究所", de: "Das Institut zur Uhrenregulierung", el: "Ινστιτούτο Ρύθμισης Ωρολογίων", ja: "時計調整研究所", hi: "समय विनियमन संस्थान" },
-                author: { tr: "Ahmet Hamdi Tanpınar", en: "Ahmet Hamdi Tanpınar", fr: "Ahmet Hamdi Tanpınar", ar: "أحمد حمدي طانبنار", fa: "احمد حمدی طانپینار", zh: "艾哈迈德·哈姆迪·坦皮纳尔", de: "Ahmet Hamdi Tanpınar", el: "Αχμέτ Χαμντί Τανπινάρ", ja: "アフメト・ハムディ・タンピナル", hi: "अहमद हम्दी तानपिनार" },
-                locationName: { tr: "Şehzadebaşı (İstanbul)", en: "Şehzadebaşı (Istanbul)", fr: "Şehzadebaşı (Istanbul)", ar: "شهزاده باشي (إسطنبول)", fa: "شاهزاده‌باشی (استانبول)", zh: "谢扎德巴什 (伊斯坦布尔)", de: "Şehzadebaşı (Istanbul)", el: "Şehzadebaşı (Κωνσταντινούπολη)", ja: "シェフザーデバシュ (イスタンブール)", hi: "शेहजादेबासी (इस्तांबुल)" },
-                lat: 41.0082, lng: 28.9784, emoji: "⏰",
-                quote: {
-                    tr: "Şehzadebaşı'nın o eski, huzurlu ramazan akşamlarında saat sesleri insanı zamanın dışına taşıardı.",
-                    en: "In those old, peaceful Ramadan evenings of Şehzadebaşı, the sounds of clocks carried a person outside of time.",
-                    fr: "En ces vieux et paisibles soirs de Ramadan à Şehzadebaşı, le son des horloges transportait l'homme hors du temps.",
-                    ar: "في تلك الأمسيات الرمضانية القديمة الهادئة في شهزاده باشي، كانت أصوات الساعات تنقل الإنسان خارج الزمن.",
-                    fa: "در آن شامگاهان آرام و قدیمی ماه رمضان در شاهزاده‌باشی، صدای ساعت‌ها انسان را به خارج از زمان می‌برد.",
-                    zh: "在谢扎德巴什那些古老而宁静的斋月夜晚，钟声将人带到了时间之外。",
-                    de: "In jenen alten, friedlichen Ramadan-Abenden von Şehzadebaşı trugen die Uhrengeräusche den Menschen aus der Zeit.",
-                    el: "Σε εκείνα τα παλιά, ειρηνικά βράδια του Ραμαζανιού στο Şehzadebaşı, οι ήχοι των ρολογιών μετέφεραν τον άνθρωπο έξω από τον χρόνο.",
-                    ja: "シェフザーデバシュの古く平和なラマダンの夕べには、時計の音が人を時間の外へと運んでいきました。",
-                    hi: "शेहजादेबासी की उन पुरानी, शांत रमजान की शामों में घड़ियों की आवाजें इंसान को समय से बाहर ले जाती थीं."
-                },
-                image: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=800"
-            },
-            {
-                id: 4,
-                title: { tr: "İnce Memed", en: "Memed, My Hawk", fr: "Memed le Migre", ar: "إينجه ميميد", fa: "مهمد لاغر / اینجه ممید", zh: "瘦子梅梅德", de: "Ince Memed", el: "Ιντζέ Μεμέτ", ja: "インジェ・メメト", hi: "इन्से मेमेद" },
-                author: { tr: "Yaşar Kemal", en: "Yaşar Kemal", fr: "Yaşar Kemal", ar: "ياشار كمال", fa: "یاشار کمال", zh: "亚沙尔·凯末尔", de: "Yaşar Kemal", el: "Γιασάρ Κεμάλ", ja: "ヤシャル・ケマル", hi: "यासार केमाल" },
-                locationName: { tr: "Çukurova / Toroslar (Adana)", en: "Çukurova / Taurus Mts (Adana)", fr: "Çukurova / Monts Taurus (Adana)", ar: "تشوكوروفا / جبال توروس (اضنة)", fa: "چوکورووا / کوه‌های توروس (آدانا)", zh: "丘库罗瓦 / 金牛座山脉 (阿达纳)", de: "Çukurova / Taurusgebirge (Adana)", el: "Τσουקורόβα / Όρη Ταύρος (Άδανα)", ja: "チュクロヴァ / トロス山脈 (アダナ)", hi: "चुकुरोवा / टॉरस पर्वत (अदाना)" },
-                lat: 37.0000, lng: 35.3213, emoji: "☀️",
-                quote: {
-                    tr: "Çukurova yanıyor, demir gibi kızıyordu. Toroslar'ın ardında ise bambaşka bir dünya esiyordu.",
-                    en: "Çukurova was burning, glowing like iron. Behind the Taurus Mountains, a completely different world was blowing.",
-                    fr: "Çukurova brûlait, rougeoyant comme du fer. Derrière les monts Taurus soufflait un monde complètement différent.",
-                    ar: "كانت تشوكوروفا تحترق وتتوهج مثل الحديد. وخلف جبال توروس، كان هواء عالم مختلف تماماً يهب.",
-                    fa: "چوکورووا می‌سوخت و مانند آهن سرخ می‌شد. در پشت کوه‌های توروس نیز دنیایی کاملاً متفاوت می‌وزید.",
-                    zh: "丘库罗瓦在燃烧，像铁一样发红。在金牛座山脉背后，吹拂着一个完全不同的世界。",
-                    de: "Çukurova brannte und glühte wie Eisen. Hinter dem Taurusgebirge wehte eine völlig andere Welt.",
-                    el: "Η Τσουקורόβα φλεγόταν. Πίσω από τα Όρη Ταύρος φυσούσε ένας εντελώς διαφορετικός κόσμος.",
-                    ja: "チュクロヴァは燃え上がり、鉄のように赤くなっていました。ロス山脈の向こうにはまったく異なる世界が吹いていました。",
-                    hi: "चुकुरोवा जल रहा था, लोहे की तरह तप रहा था। टॉरस पर्वतों के पीछे एक बिल्कुल अलग दुनिया बह रही थी."
-                },
-                image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800"
-            },
-            {
-                id: 5,
-                title: { tr: "Seyahatname", en: "Book of Travels", fr: "Livre des Voyages", ar: "سياحتنامة", fa: "سیاحت‌نامه اولیاء چلبی", zh: "旅行记", de: "Seyahatname", el: "Σεγιαχατνάμε", ja: "旅行記", hi: "सेयाहतनामे" },
-                author: { tr: "Evliya Çelebi", en: "Evliya Çelebi", fr: "Evliya Çelebi", ar: "أولياء جلبي", fa: "اولیاء چلبی", zh: "爱维利亚·切莱比", de: "Evliya Çelebi", el: "Εβλιγιά Τσελεμπί", ja: "エヴリヤ・チェレビ", hi: "एवलिया सेलेबी" },
-                locationName: { tr: "Selimiye Camii (Edirne)", en: "Selimiye Mosque (Edirne)", fr: "Mosquée Selimiye (Edirne)", ar: "جامع السليمية (أدرنة)", fa: "مسجد سلیمیه (ادرنه)", zh: "塞利米耶清真寺 (埃迪尔内)", de: "Selimiye-Moschee (Edirne)", el: "Τζαμί Σελινιγιέ (Αδριανούπολη)", ja: "セリミエ・モスク (エディルネ)", hi: "सेलिमीये मस्जिद (एदिर्ने)" },
-                lat: 41.6771, lng: 26.5557, emoji: "🕌",
-                quote: {
-                    tr: "Edirne şehri rûy-i zemin cennetinden bir köşedir. Mimar Sinan'ın kalfalık eserim dediği Selimiye cihanın göz bebeğidir.",
-                    en: "The city of Edirne is a corner from the paradise of the earth. Selimiye, which Mimar Sinan called his journeyman piece, is the apple of the world's eye.",
-                    fr: "La ville d'Edirne est un coin du paradis terrestre. Selimiye, que Mimar Sinan appelait son œuvre de compagnon, est la prunelle des yeux du monde.",
-                    ar: "مدينة أدرنة هي ركن من جنة الأرض. والسليمية التي وصفها معمار سنان بأنها تحفة هي قرة عين العالم.",
-                    fa: "شهر ادرنه گوشه‌ای از بهشت روی زمین است. سلیمیه که معمار سنان آن را شاهکار دوره استادکاری‌اش نامیده، نور چشم جهان است.",
-                    zh: "埃迪尔内市是地球天堂的一个角落。被米马尔·希нан称为其代表作的塞利米耶是世界的掌上明珠。",
-                    de: "Die Stadt Edirne ist eine Ecke aus dem Paradies der Erde. Selimiye, das Mimar Sinan sein Meisterwerk nannte, ist der Augapfel der Welt.",
-                    el: "Η πόλη της Αδριανούπολης είναι μια γωνιά από τον παράδεισο της γης. Το Σελινιγιέ είναι η κόρη των οφθαλμών του κόσμου.",
-                    ja: "エディルネの街は地上の楽園の一隅です。ミマル・スィナンが代表作と呼んだセリミエは世界の見果てぬ夢です。",
-                    hi: "एदिर्ने शहर पृथ्वी के स्वर्ग का एक कोना है। सेलिमीये, जिसे मीमार सिनान ने अपनी उत्कृष्ट कृति कहा, दुनिया की आँख का तारा है。"
-                },
-                image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800"
+                title: "Miratü'l-Mümalik",
+                author: "Seydi Ali Reis",
+                initialLocation: "Delhi / Hint Okyanusu",
+                lat: 28.6139, lng: 77.2090,
+                image: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800",
+                description: "Osmanlı denizcisi Seydi Ali Reis'in Hint kaptanlığından İstanbul'a dönerken yaşadığı tehlikeli serüvenler.",
+                journey: [
+                    { step: 1, title: "Gucerat / Surat Limanı", lat: 21.1702, lng: 72.8311, quote: "Portekiz donanmasının ablukasından kurtulup Gucerat sahilinden denize açıldık.", image: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800" },
+                    { step: 2, title: "Sind & Belucistan Çölleri", lat: 25.3960, lng: 68.3578, quote: "Sind çöllerinde susuzluktan ciğerimiz kebap oldu, çöl aşarak Safevi topraklarına yöneldik.", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=800" },
+                    { step: 3, title: "Herat (Horasan)", lat: 34.3418, lng: 62.2027, quote: "Herat şehrinde ilim irfan meclislerinde bulunup Hüseyin Baykara'nın diyarını ziyaret ettik.", image: "https://images.unsplash.com/photo-1599839575945-a9e330adc30d?w=800" },
+                    { step: 4, title: "Kazvin & Tahran (İran)", lat: 35.6892, lng: 51.3890, quote: "Şah Tahmasp'ın huzuruna varıp İran memleketinde ikram ve hürmet gördük.", image: "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?w=800" },
+                    { step: 5, title: "İstanbul (Varış)", lat: 41.0082, lng: 28.9784, quote: "Nihayet aziz İstanbul'a, Kanuni Sultan Süleyman'ın huzuruna salimen ulaştık.", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800" }
+                ]
             }
         ];
 
-        let currentLang = 'tr';
-
         const map = L.map('map', { 
             zoomControl: false,
-            minZoom: 6,
-            maxZoom: 16,
-            fadeAnimation: true,
-            zoomAnimation: true
-        }).setView([39.1667, 35.3333], 6);
+            minZoom: 4,
+            maxZoom: 16
+        }).setView([38.9637, 35.2433], 5);
 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         const layers = {
-            standard: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, keepBuffer: 8, attribution: '&copy; OpenStreetMap' }),
-            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, keepBuffer: 8, attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap' }),
-            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, keepBuffer: 8, attribution: 'Tiles &copy; Esri' })
+            standard: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM' }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: 'Tiles &copy; Esri' })
         };
 
         let currentLayer = layers.standard.addTo(map);
-        let markersLayer = {};
-        let cardElementsMap = {};
-
-        // Menü Kontrolleri
-        function toggleFontMenu() {
-            const menu = document.getElementById('font-style-menu');
-            menu.classList.toggle('show');
-            document.getElementById('map-menu').classList.remove('show');
-            document.getElementById('lang-menu').classList.remove('show');
-            document.getElementById('searchSuggestions').classList.remove('show');
-        }
+        let activeMarkers = [];
+        let activePolyline = null;
+        let activeWorkId = null;
 
         function toggleMapMenu() {
             document.getElementById('map-menu').classList.toggle('show');
-            document.getElementById('font-style-menu').classList.remove('show');
-            document.getElementById('lang-menu').classList.remove('show');
-            document.getElementById('searchSuggestions').classList.remove('show');
-        }
-
-        function toggleLangMenu() {
-            document.getElementById('lang-menu').classList.toggle('show');
-            document.getElementById('font-style-menu').classList.remove('show');
-            document.getElementById('map-menu').classList.remove('show');
-            document.getElementById('searchSuggestions').classList.remove('show');
         }
 
         window.addEventListener('click', function(e) {
-            if (!document.getElementById('font-container').contains(e.target)) {
-                document.getElementById('font-style-menu').classList.remove('show');
-            }
-            if (!document.getElementById('lang-container').contains(e.target)) {
-                document.getElementById('lang-menu').classList.remove('show');
-            }
             if (!e.target.closest('#map-mode-btn') && !e.target.closest('#map-menu')) {
                 document.getElementById('map-menu').classList.remove('show');
             }
@@ -535,36 +380,30 @@
             }
         });
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.getElementById('lang-menu').classList.remove('show');
-            renderApp();
-        }
-
         function setMapStyle(styleKey) {
             map.removeLayer(currentLayer);
             currentLayer = layers[styleKey].addTo(map);
             document.getElementById('map-menu').classList.remove('show');
         }
 
-        function setFontFamily(fontKey, btnElement) {
-            let fontValue = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-            if (fontKey === 'rosemary') fontValue = '"Rosemary", cursive, sans-serif';
-            if (fontKey === 'roboto') fontValue = '"Roboto", sans-serif';
-            if (fontKey === 'playfair') fontValue = '"Playfair Display", serif';
-
-            document.documentElement.style.setProperty('--app-font', fontValue);
-            document.querySelectorAll('.font-opt').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
+        // Haritayı temizleme ve ilk konumlara döndürme
+        function resetMapToInitial() {
+            clearMapElements();
+            activeWorkId = null;
+            map.setView([38.9637, 35.2433], 5);
+            renderApp();
         }
 
-        function setFontWeight(weightValue, btnElement) {
-            document.documentElement.style.setProperty('--app-weight', weightValue);
-            document.querySelectorAll('.weight-opt').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
+        function clearMapElements() {
+            activeMarkers.forEach(m => map.removeLayer(m));
+            activeMarkers = [];
+            if (activePolyline) {
+                map.removeLayer(activePolyline);
+                activePolyline = null;
+            }
         }
 
-        // Arama ve Anlık Tamamlama (Autocomplete) İşlevselliği
+        // Arama ve Anlık Tamamlama
         function handleSearchInput(query) {
             const suggestionsBox = document.getElementById('searchSuggestions');
             suggestionsBox.innerHTML = '';
@@ -575,19 +414,19 @@
             }
 
             const lowerQuery = query.toLowerCase();
-            const matches = literaryData.filter(item => {
-                const title = item.title[currentLang] || item.title['tr'];
-                return title.toLowerCase().includes(lowerQuery);
-            });
+            const matches = classicalWorks.filter(item => 
+                item.title.toLowerCase().includes(lowerQuery) || item.author.toLowerCase().includes(lowerQuery)
+            );
 
             if (matches.length > 0) {
                 matches.forEach(item => {
-                    const title = item.title[currentLang] || item.title['tr'];
                     const div = document.createElement('div');
                     div.className = 'suggestion-item';
-                    div.innerText = title;
+                    div.innerText = `${item.title} (${item.author})`;
                     div.onclick = function() {
-                        selectWork(item.id, title);
+                        selectWorkJourney(item.id);
+                        document.getElementById('workSearchInput').value = item.title;
+                        suggestionsBox.classList.remove('show');
                     };
                     suggestionsBox.appendChild(div);
                 });
@@ -597,73 +436,114 @@
             }
         }
 
-        function selectWork(id, title) {
-            document.getElementById('workSearchInput').value = title;
-            document.getElementById('searchSuggestions').classList.remove('show');
+        // Bir esere tıklandığında veya seçildiğinde kronolojik yolculuk pimlerini ve iplerini göster
+        function selectWorkJourney(workId) {
+            clearMapElements();
+            activeWorkId = workId;
+            renderApp(); // Kartlardaki aktif rozetini güncellemek için
 
-            const card = cardElementsMap[id];
-            if (card) {
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                card.classList.add('highlight');
-                setTimeout(() => {
-                    card.classList.remove('highlight');
-                }, 1500);
+            const work = classicalWorks.find(w => w.id === workId);
+            if (!work) return;
+
+            let latLngs = [];
+            let boundsPoints = [];
+
+            // Kronolojik adımları pim olarak ekle
+            work.journey.forEach((stop, index) => {
+                const point = [stop.lat, stop.lng];
+                latLngs.push(point);
+                boundsPoints.push(point);
+
+                // Şık dairesel numaralı pim (İp misali bağlantı için duraklar)
+                const numberedIcon = L.divIcon({
+                    className: 'custom-numbered-pin',
+                    html: `<div style="background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(10px); border: 2px solid #f59e0b; color: #f59e0b; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">${stop.step}</div>`,
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18],
+                    popupAnchor: [0, -20]
+                });
+
+                const marker = L.marker(point, { icon: numberedIcon }).addTo(map);
+                marker.bindPopup(`
+                    <h4>Pim ${stop.step}: ${stop.title}</h4>
+                    <em>${work.title} (${work.author})</em>
+                    <img src="${stop.image}" alt="${stop.title}">
+                    <p>"${stop.quote}"</p>
+                `);
+
+                activeMarkers.push(marker);
+            });
+
+            // Mekanları birbirine bağlayan ip misali altın rengi çizgi (Polyline)
+            activePolyline = L.polyline(latLngs, {
+                color: '#f59e0b',
+                weight: 3.5,
+                opacity: 0.85,
+                dashArray: '6, 8',
+                lineCap: 'round'
+            }).addTo(map);
+
+            // Tüm rotayı kapsayacak şekilde harita ölçeğini genişlet
+            if (boundsPoints.length > 0) {
+                map.fitBounds(L.latLngBounds(boundsPoints), { padding: [60, 60], maxZoom: 9, animate: true });
             }
         }
 
+        // Ana Uygulama Çizimi
         function renderApp() {
-            document.getElementById('ui-title').innerText = uiTexts[currentLang].title;
-            document.getElementById('font-style-btn').innerText = uiTexts[currentLang].fontStyle;
-            document.getElementById('map-mode-btn').innerText = uiTexts[currentLang].mapMode;
-            document.getElementById('lbl-font').innerText = uiTexts[currentLang].fontTitle;
-            document.getElementById('lbl-weight').innerText = uiTexts[currentLang].weightTitle;
-            document.getElementById('workSearchInput').placeholder = uiTexts[currentLang].searchPlaceholder;
-
             const workListContainer = document.getElementById('workList');
             workListContainer.innerHTML = '';
 
-            for (let id in markersLayer) {
-                map.removeLayer(markersLayer[id]);
-            }
-            markersLayer = {};
-            cardElementsMap = {};
-
-            literaryData.forEach(function(item) {
+            classicalWorks.forEach(function(item) {
                 const card = document.createElement('div');
-                card.className = 'work-card';
-                card.innerHTML = '<h3>' + item.title[currentLang] + '</h3>' +
-                                 '<div class="author">' + item.author[currentLang] + '</div>' +
-                                 '<div class="location">📍 ' + item.locationName[currentLang] + '</div>' +
-                                 '<img src="' + item.image + '" alt="' + item.title[currentLang] + '">' +
-                                 '<p>"' + item.quote[currentLang] + '"</p>';
+                card.className = `work-card ${activeWorkId === item.id ? 'highlight' : ''}`;
+                
+                let activeBadgeHtml = activeWorkId === item.id ? '<span class="active-badge">Rotada Aktif</span>' : '';
 
-                cardElementsMap[item.id] = card;
+                card.innerHTML = `
+                    ${activeBadgeHtml}
+                    <h3>${item.title}</h3>
+                    <div class="author">${item.author}</div>
+                    <div class="location">📌 ${item.initialLocation}</div>
+                    <img src="${item.image}" alt="${item.title}">
+                    <p>${item.description}</p>
+                `;
 
-                const emojiIcon = L.divIcon({
-                    className: 'custom-emoji-pin',
-                    html: '<div style="background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1.5px solid rgba(245, 158, 11, 0.5); border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s;">' + item.emoji + '</div>',
-                    iconSize: [42, 42],
-                    iconAnchor: [21, 21],
-                    popupAnchor: [0, -24]
-                });
-
-                const marker = L.marker([item.lat, item.lng], { icon: emojiIcon }).addTo(map);
-                marker.bindPopup('<b>' + item.title[currentLang] + '</b><br><em>' + item.author[currentLang] + '</em><br><b>' + uiTexts[currentLang].loc + '</b> ' + item.locationName[currentLang] + '<br><img src="' + item.image + '" alt="' + item.title[currentLang] + '"><br>"' + item.quote[currentLang] + '"');
-
-                markersLayer[item.id] = marker;
-
-                // Kart tıklanınca haritada direkt pime odaklanma ve popup açma
+                // Kart tıklanınca o eserin kronolojik seyahat pimlerini ve ip zincirini aç
                 card.addEventListener('click', function() {
-                    map.setView([item.lat, item.lng], 10, { animate: true, duration: 1 });
-                    if (markersLayer[item.id]) {
-                        markersLayer[item.id].openPopup();
-                    }
+                    selectWorkJourney(item.id);
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
 
                 workListContainer.appendChild(card);
             });
-            
-            setTimeout(function() { map.invalidateSize(); }, 200);
+
+            // Eğer hiçbir rota seçili değilse başlangıçta ana eserlerin merkez konumlarını göster
+            if (!activeWorkId && activeMarkers.length === 0) {
+                classicalWorks.forEach(function(item) {
+                    const initialIcon = L.divIcon({
+                        className: 'custom-initial-pin',
+                        html: `<div style="background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(10px); border: 2px solid #a1a1aa; color: #fff; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">🏛️</div>`,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                        popupAnchor: [0, -22]
+                    });
+
+                    const marker = L.marker([item.lat, item.lng], { icon: initialIcon }).addTo(map);
+                    marker.bindPopup(`
+                        <h4>${item.title}</h4>
+                        <em>Yazar: ${item.author}</em>
+                        <img src="${item.image}" alt="${item.title}">
+                        <p><strong>Merkez:</strong> ${item.initialLocation}</p>
+                    `);
+
+                    marker.on('click', function() {
+                        selectWorkJourney(item.id);
+                    });
+
+                    activeMarkers.push(marker);
+                });
+            }
         }
 
         renderApp();
