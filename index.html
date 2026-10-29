@@ -61,15 +61,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
         }
-        .sidebar-header h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+        .sidebar-header h1 { font-size: 1.05rem; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
         
         /* Arama Kutusu */
         .search-container {
             position: relative;
             flex: 1;
-            max-width: 170px;
+            max-width: 160px;
         }
         .search-input {
             width: 100%;
@@ -78,7 +78,7 @@
             border-radius: 20px;
             padding: 7px 12px 7px 30px;
             color: var(--text-primary);
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             outline: none;
             transition: all 0.2s;
         }
@@ -92,7 +92,7 @@
             left: 10px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             pointer-events: none;
             color: var(--text-secondary);
         }
@@ -195,23 +195,23 @@
         .leaflet-container a.leaflet-popup-close-button:hover { background: rgba(245, 158, 11, 0.8) !important; }
 
         /* Sağ Üst Kontroller */
-        .top-controls { position: absolute; top: 20px; right: 24px; z-index: 2000; display: flex; gap: 12px; }
+        .top-controls { position: absolute; top: 20px; right: 24px; z-index: 2000; display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
         
         .pill-btn { 
             background: rgba(28, 28, 30, 0.88); 
             backdrop-filter: blur(20px); 
             color: var(--text-primary); 
             border: 1px solid var(--border-glass); 
-            padding: 8px 18px; 
+            padding: 8px 16px; 
             height: 42px; 
             border-radius: 21px; 
             cursor: pointer; 
-            font-size: 0.88rem; 
+            font-size: 0.85rem; 
             font-weight: 500;
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 8px;
+            gap: 6px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
             transition: all 0.2s; 
         }
@@ -230,23 +230,45 @@
             width: 170px; 
             padding: 6px;
             z-index: 2500;
+            max-height: 320px;
+            overflow-y: auto;
         }
         .dropdown-menu.show { display: block; animation: fadeIn 0.2s ease; }
+
+        /* İki Sütunlu Yazı Stili Menüsü */
+        #font-style-menu {
+            width: 320px;
+            display: none;
+            padding: 12px;
+            gap: 10px;
+        }
+        #font-style-menu.show { display: flex !important; }
+        .menu-column { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .menu-column-title {
+            font-size: 0.72rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+            padding-left: 4px;
+        }
         
         .dropdown-option { 
-            padding: 9px 12px; 
+            padding: 8px 10px; 
             color: var(--text-primary); 
             background: none; 
             border: none; 
             width: 100%; 
             text-align: left; 
             cursor: pointer; 
-            font-size: 0.84rem; 
+            font-size: 0.83rem; 
             border-radius: 8px;
             transition: background 0.15s;
             font-weight: 500;
         }
         .dropdown-option:hover { background-color: rgba(245, 158, 11, 0.2); color: var(--accent-color); }
+        .dropdown-option.active { background-color: rgba(245, 158, 11, 0.3); color: var(--accent-color); }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-6px); }
@@ -264,8 +286,26 @@
 
     <!-- Sağ Üst Kontroller -->
     <div class="top-controls">
+        <!-- Yazı Stili Butonu -->
+        <div style="position: relative;" id="font-container">
+            <button class="pill-btn" onclick="toggleFontMenu()" id="font-style-btn">🔤 Yazı Stili</button>
+            <div id="font-style-menu" class="dropdown-menu">
+                <div class="menu-column">
+                    <div class="menu-column-title" id="lbl-font">Yazı Tipi</div>
+                    <button class="dropdown-option font-opt active" onclick="setFontFamily('default', this)">Varsayılan</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('roboto', this)">Roboto</button>
+                    <button class="dropdown-option font-opt" onclick="setFontFamily('playfair', this)">Playfair</button>
+                </div>
+                <div class="menu-column">
+                    <div class="menu-column-title" id="lbl-weight">Kalınlık</div>
+                    <button class="dropdown-option weight-opt active" onclick="setFontWeight('400', this)">Normal</button>
+                    <button class="dropdown-option weight-opt" onclick="setFontWeight('700', this)">Kalın</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Harita Modu Butonu -->
-        <div style="position: relative;">
+        <div style="position: relative;" id="map-container">
             <button class="pill-btn" onclick="toggleMapMenu()" id="map-mode-btn">🗺️ Harita Modu</button>
             <div id="map-menu" class="dropdown-menu">
                 <button class="dropdown-option" onclick="setMapStyle('standard')">🗺️ Standart Atlas</button>
@@ -274,8 +314,25 @@
             </div>
         </div>
 
-        <!-- Sıfırlama / Ana Görünüm Butonu -->
-        <button class="pill-btn" onclick="resetMapToInitial()" title="İlk Konumlara Dön">🔄 Rota Sıfırla</button>
+        <!-- Dil Seçici Butonu -->
+        <div style="position: relative;" id="lang-container">
+            <button class="pill-btn" onclick="toggleLangMenu()">🌐 Dil / Lang</button>
+            <div id="lang-menu" class="dropdown-menu">
+                <button class="dropdown-option" onclick="setLanguage('tr')">🇹🇷 Türkçe</button>
+                <button class="dropdown-option" onclick="setLanguage('en')">🇬🇧 English</button>
+                <button class="dropdown-option" onclick="setLanguage('fr')">🇫🇷 Français</button>
+                <button class="dropdown-option" onclick="setLanguage('ar')">🇸🇦 العربية</button>
+                <button class="dropdown-option" onclick="setLanguage('fa')">🇮🇷 فارسی</button>
+                <button class="dropdown-option" onclick="setLanguage('zh')">🇨🇳 中文</button>
+                <button class="dropdown-option" onclick="setLanguage('de')">🇩🇪 Deutsch</button>
+                <button class="dropdown-option" onclick="setLanguage('el')">🇬🇷 Ελληνικά</button>
+                <button class="dropdown-option" onclick="setLanguage('ja')">🇯🇵 日本語</button>
+                <button class="dropdown-option" onclick="setLanguage('hi')">🇮🇳 हिन्दी</button>
+            </div>
+        </div>
+
+        <!-- Sıfırlama Butonu -->
+        <button class="pill-btn" onclick="resetMapToInitial()" title="İlk Konumlara Dön">🔄 Sıfırla</button>
     </div>
 
     <div id="sidebar">
@@ -296,7 +353,21 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Klasik Türk Edebiyatı Değerli Eserleri ve Kronolojik Rota Durakları
+        const uiTexts = {
+            tr: { title: "Klasik Edebiyat Rotaları", mapMode: "🗺️ Harita Modu", fontStyle: "🔤 Yazı Stili", fontTitle: "Yazı Tipi", weightTitle: "Kalınlık", searchPlaceholder: "Eser ara..." },
+            en: { title: "Classical Literature Routes", mapMode: "🗺️ Map Style", fontStyle: "🔤 Font Style", fontTitle: "Font Family", weightTitle: "Weight", searchPlaceholder: "Search work..." },
+            fr: { title: "Routes de Littérature Classique", mapMode: "🗺️ Style de Carte", fontStyle: "🔤 Style de Police", fontTitle: "Police", weightTitle: "Épaisseur", searchPlaceholder: "Rechercher..." },
+            ar: { title: "طرق الأدب الكلاسيكي", mapMode: "🗺️ نمط الخريطة", fontStyle: "🔤 نمط الخط", fontTitle: "نوع الخط", weightTitle: "السمك", searchPlaceholder: "بحث عن عمل..." },
+            fa: { title: "مسیرهای ادبیات کلاسیک", mapMode: "🗺️ حالت نقشه", fontStyle: "🔤 سبک قلم", fontTitle: "نوع قلم", weightTitle: "ضخامت", searchPlaceholder: "جستجوی اثر..." },
+            zh: { title: "古典文学路线", mapMode: "🗺️ 地图样式", fontStyle: "🔤 字体样式", fontTitle: "字体", weightTitle: "字重", searchPlaceholder: "搜索作品..." },
+            de: { title: "Klassische Literaturrouten", mapMode: "🗺️ Kartenstil", fontStyle: "🔤 Schriftstil", fontTitle: "Schriftart", weightTitle: "Stärke", searchPlaceholder: "Werk suchen..." },
+            el: { title: "Διαδρομές Κλασικής Λογοτεχνίας", mapMode: "🗺️ Στυλ Χάρτη", fontStyle: "🔤 Στυλ Γραμματοσειράς", fontTitle: "Γραμματοσειρά", weightTitle: "Πάχος", searchPlaceholder: "Αναζήτηση..." },
+            ja: { title: "古典文学ルート", mapMode: "🗺️ マップスタイル", fontStyle: "🔤 フォントスタイル", fontTitle: "フォント", weightTitle: "太さ", normal: "標準", bold: "太字", searchPlaceholder: "作品を検索..." },
+            hi: { title: "शास्त्रीय साहित्य मार्ग", mapMode: "🗺️ मानचित्र शैली", fontStyle: "🔤 फ़ॉन्ट शैली", fontTitle: "फ़ॉन्ट", weightTitle: "मोटाई", searchPlaceholder: "कृति खोजें..." }
+        };
+
+        let currentLang = 'tr';
+
         const classicalWorks = [
             {
                 id: 1,
@@ -367,12 +438,36 @@
         let activePolyline = null;
         let activeWorkId = null;
 
+        // Menü Kontrolleri
+        function toggleFontMenu() {
+            document.getElementById('font-style-menu').classList.toggle('show');
+            document.getElementById('map-menu').classList.remove('show');
+            document.getElementById('lang-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
+        }
+
         function toggleMapMenu() {
             document.getElementById('map-menu').classList.toggle('show');
+            document.getElementById('font-style-menu').classList.remove('show');
+            document.getElementById('lang-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
+        }
+
+        function toggleLangMenu() {
+            document.getElementById('lang-menu').classList.toggle('show');
+            document.getElementById('font-style-menu').classList.remove('show');
+            document.getElementById('map-menu').classList.remove('show');
+            document.getElementById('searchSuggestions').classList.remove('show');
         }
 
         window.addEventListener('click', function(e) {
-            if (!e.target.closest('#map-mode-btn') && !e.target.closest('#map-menu')) {
+            if (!document.getElementById('font-container').contains(e.target)) {
+                document.getElementById('font-style-menu').classList.remove('show');
+            }
+            if (!document.getElementById('lang-container').contains(e.target)) {
+                document.getElementById('lang-menu').classList.remove('show');
+            }
+            if (!document.getElementById('map-container').contains(e.target)) {
                 document.getElementById('map-menu').classList.remove('show');
             }
             if (!e.target.closest('.search-container')) {
@@ -380,10 +475,32 @@
             }
         });
 
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('lang-menu').classList.remove('show');
+            renderApp();
+        }
+
         function setMapStyle(styleKey) {
             map.removeLayer(currentLayer);
             currentLayer = layers[styleKey].addTo(map);
             document.getElementById('map-menu').classList.remove('show');
+        }
+
+        function setFontFamily(fontKey, btnElement) {
+            let fontValue = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+            if (fontKey === 'roboto') fontValue = '"Roboto", sans-serif';
+            if (fontKey === 'playfair') fontValue = '"Playfair Display", serif';
+
+            document.documentElement.style.setProperty('--app-font', fontValue);
+            document.querySelectorAll('.font-opt').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        function setFontWeight(weightValue, btnElement) {
+            document.documentElement.style.setProperty('--app-weight', weightValue);
+            document.querySelectorAll('.weight-opt').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
         }
 
         // Haritayı temizleme ve ilk konumlara döndürme
@@ -436,11 +553,11 @@
             }
         }
 
-        // Bir esere tıklandığında veya seçildiğinde kronolojik yolculuk pimlerini ve iplerini göster
+        // Bir esere tıklandığında kronolojik yolculuk pimlerini ve iplerini göster
         function selectWorkJourney(workId) {
             clearMapElements();
             activeWorkId = workId;
-            renderApp(); // Kartlardaki aktif rozetini güncellemek için
+            renderApp();
 
             const work = classicalWorks.find(w => w.id === workId);
             if (!work) return;
@@ -448,13 +565,11 @@
             let latLngs = [];
             let boundsPoints = [];
 
-            // Kronolojik adımları pim olarak ekle
             work.journey.forEach((stop, index) => {
                 const point = [stop.lat, stop.lng];
                 latLngs.push(point);
                 boundsPoints.push(point);
 
-                // Şık dairesel numaralı pim (İp misali bağlantı için duraklar)
                 const numberedIcon = L.divIcon({
                     className: 'custom-numbered-pin',
                     html: `<div style="background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(10px); border: 2px solid #f59e0b; color: #f59e0b; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.6);">${stop.step}</div>`,
@@ -474,7 +589,6 @@
                 activeMarkers.push(marker);
             });
 
-            // Mekanları birbirine bağlayan ip misali altın rengi çizgi (Polyline)
             activePolyline = L.polyline(latLngs, {
                 color: '#f59e0b',
                 weight: 3.5,
@@ -483,7 +597,6 @@
                 lineCap: 'round'
             }).addTo(map);
 
-            // Tüm rotayı kapsayacak şekilde harita ölçeğini genişlet
             if (boundsPoints.length > 0) {
                 map.fitBounds(L.latLngBounds(boundsPoints), { padding: [60, 60], maxZoom: 9, animate: true });
             }
@@ -491,6 +604,13 @@
 
         // Ana Uygulama Çizimi
         function renderApp() {
+            document.getElementById('ui-title').innerText = uiTexts[currentLang].title;
+            document.getElementById('font-style-btn').innerText = uiTexts[currentLang].fontStyle;
+            document.getElementById('map-mode-btn').innerText = uiTexts[currentLang].mapMode;
+            document.getElementById('lbl-font').innerText = uiTexts[currentLang].fontTitle;
+            document.getElementById('lbl-weight').innerText = uiTexts[currentLang].weightTitle;
+            document.getElementById('workSearchInput').placeholder = uiTexts[currentLang].searchPlaceholder;
+
             const workListContainer = document.getElementById('workList');
             workListContainer.innerHTML = '';
 
@@ -509,7 +629,6 @@
                     <p>${item.description}</p>
                 `;
 
-                // Kart tıklanınca o eserin kronolojik seyahat pimlerini ve ip zincirini aç
                 card.addEventListener('click', function() {
                     selectWorkJourney(item.id);
                     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -518,7 +637,6 @@
                 workListContainer.appendChild(card);
             });
 
-            // Eğer hiçbir rota seçili değilse başlangıçta ana eserlerin merkez konumlarını göster
             if (!activeWorkId && activeMarkers.length === 0) {
                 classicalWorks.forEach(function(item) {
                     const initialIcon = L.divIcon({
